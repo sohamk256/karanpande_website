@@ -1,56 +1,68 @@
-import { useEffect } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
-import { HOME } from "@/constants/testIds";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import SiteLayout from "@/components/site/SiteLayout";
+import Home from "@/pages/Home";
+import GalleryPage from "@/pages/GalleryPage";
+import CinematicPage from "@/pages/CinematicPage";
+import Contact from "@/pages/Contact";
+import AdminLogin from "@/pages/AdminLogin";
+import AdminDashboard from "@/pages/AdminDashboard";
+import { auth } from "@/lib/api";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+function RequireAdmin({ children }) {
+  if (!auth.isAuthed()) return <Navigate to="/admin/login" replace />;
+  return children;
+}
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          data-testid={HOME.emergentLink}
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
-
-function App() {
+export default function App() {
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
+          {/* Public site with layout */}
+          <Route element={<SiteLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route
+              path="/wedding"
+              element={
+                <GalleryPage
+                  category="wedding"
+                  title="Weddings"
+                  chapter="Chapter 01"
+                  subtitle="Ceremonies photographed like they're written — heirloom-warm, editorial in cut, honest in colour. Selections from mandaps, receptions and quiet in-between moments across India."
+                  next={{ to: "/pre-wedding", title: "Pre-Wedding →" }}
+                />
+              }
+            />
+            <Route
+              path="/pre-wedding"
+              element={
+                <GalleryPage
+                  category="pre-wedding"
+                  title="Pre-Wedding"
+                  chapter="Chapter 02"
+                  subtitle="Portraits made before the wedding day — in dunes, terraces, forests and old streets. Slow, cinematic, and rarely posed."
+                  next={{ to: "/cinematic", title: "Cinematic →" }}
+                />
+              }
+            />
+            <Route path="/cinematic" element={<CinematicPage />} />
+            <Route path="/contact" element={<Contact />} />
           </Route>
+
+          {/* Admin (no site layout) */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route
+            path="/admin"
+            element={
+              <RequireAdmin>
+                <AdminDashboard />
+              </RequireAdmin>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </div>
   );
 }
-
-export default App;

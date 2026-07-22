@@ -1,0 +1,26 @@
+{
+  "summary": "First-pass smoke testing of Karan Pande photography portfolio. Backend health, public media endpoints, admin auth + full CRUD verified via curl. Frontend home/hero/CTAs, wedding + pre-wedding galleries with lightbox, cinematic play + video lightbox, contact links, admin guard, login (wrong+valid), dashboard tabs, create/delete via modal, and logout all pass.",
+  "tested_scope": ["backend", "frontend", "auth", "integration"],
+  "passed": [
+    "GET /api/health -> 200 {status: ok}",
+    "GET /api/media/wedding, /pre-wedding, /cinematic return seeded lists (6/4/3+ items)",
+    "POST /api/admin/login: wrong creds -> 401; correct creds -> JWT token (field name is 'token', not 'access_token')",
+    "POST /api/admin/media without auth -> 401; with Bearer -> creates item",
+    "PUT /api/admin/media/{id} updates title",
+    "DELETE /api/admin/media/{id} removes item; subsequent GET no longer returns it",
+    "Home: hero-video, hero-cta-work, hero-cta-contact, cat-wedding/prewedding/cinematic all present; CTA navigates to /wedding",
+    "Wedding gallery: heading present, 6 images, lightbox opens on image click, next-chapter navigates to /pre-wedding",
+    "Pre-Wedding gallery: 4 images",
+    "Cinematic: 3 cine-play buttons; lightbox-video renders on click",
+    "Contact: contact-phone (tel:), contact-whatsapp (wa.me), contact-email (mailto:), contact-instagram (instagram.com) all correct hrefs",
+    "Admin guard: /admin without token redirects to /admin/login",
+    "Admin login: wrong creds stay on /admin/login; valid creds go to /admin",
+    "Admin dashboard: tab-wedding, tab-pre-wedding, tab-cinematic present; add-media-btn opens media-modal; new item created appears in grid; delete removes it; admin-logout returns to /admin/login"
+  ],
+  "failed": [],
+  "action_items": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "retest_needed": false,
+  "full_testing_deferred": true,
+  "notes": "Backend login response uses key 'token' (not 'access_token'). Frontend api client already handles this correctly. No blockers observed."
+}

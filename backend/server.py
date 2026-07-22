@@ -10,6 +10,7 @@ import re
 import logging
 import uuid
 import jwt
+import urllib.parse
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Literal
@@ -19,7 +20,31 @@ from datetime import datetime, timedelta, timezone
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
-MONGO_URL = os.environ["MONGO_URL"]
+
+def sanitize_mongo_url(url: str) -> str:
+    if not url:
+        return url
+    prefix_match = re.match(r"^(mongodb(?:\+srv)?://)", url)
+    if not prefix_match:
+        return url
+    prefix = prefix_match.group(1)
+    rest = url[len(prefix):]
+    
+    if "@" not in rest:
+        return url
+    credentials, host_part = rest.rsplit("@", 1)
+    
+    if ":" not in credentials:
+        username = urllib.parse.quote_plus(urllib.parse.unquote(credentials))
+        return f"{prefix}{username}@{host_part}"
+    
+    username, password = credentials.split(":", 1)
+    username_quoted = urllib.parse.quote_plus(urllib.parse.unquote(username))
+    password_quoted = urllib.parse.quote_plus(urllib.parse.unquote(password))
+    return f"{prefix}{username_quoted}:{password_quoted}@{host_part}"
+
+
+MONGO_URL = sanitize_mongo_url(os.environ["MONGO_URL"])
 DB_NAME = os.environ["DB_NAME"]
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "karan")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "karan@2026")

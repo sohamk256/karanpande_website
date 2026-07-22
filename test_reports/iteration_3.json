@@ -1,0 +1,33 @@
+{
+  "summary": "Verified the fix for the reported bug 'website auto scrolls to somewhere in bottom suddenly'. The TestimonialSlider in /app/frontend/src/pages/Home.jsx now uses el.scrollTo({left: ...}) on the horizontal track only, instead of card.scrollIntoView(...) which Lenis was hijacking into a full-page smooth scroll. All 7 assertions passed at viewport 1440x900.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_3.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Fix looks correct in Home.jsx TestimonialSlider.scrollToIdx: computes rectCard.left - rectEl.left offset and calls el.scrollTo({ left: el.scrollLeft + delta, behavior: 'smooth' }) which stays inside the overflow-x-auto container and is NOT intercepted by Lenis (Lenis only overrides window/document scroll).",
+    "auto-advance interval useEffect depends on [idx, count] and only calls scrollToIdx which no longer touches the page scroller — verified over an 8s idle window at the testimonials section: page.scrollTop deviation = 0px while slider.scrollLeft advanced 589 -> 803.",
+    "LenisProvider config (duration:1.6, smoothWheel:true) works normally: user-initiated window.scrollTo smooth-scrolled to bottom without any snap-jump.",
+    "Minor console warning observed on load: 'Please ensure that the container has a non-static position, like relative/fixed/absolute to ensure scroll offset is calculated correctly.' This is emitted by framer-motion's useScroll on the heroRef section — non-blocking, unrelated to the reported bug. Consider adding `position: relative` to the section wrapping heroRef (it already has `relative` class; warning may originate from a Reveal wrapper). Safe to defer."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100% (7/7)"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "verified_assertions": [
+    "Idle at top: window.scrollY stayed at 0px for 10s (max=0, threshold <=30) — no auto-jump.",
+    "testimonial-next click: document.scrollingElement.scrollTop delta = 0px; slider inner scrollLeft advanced by 214px (589 -> 803).",
+    "testimonial-prev click: document.scrollingElement.scrollTop delta = 0px; slider inner scrollLeft moved back to 589.",
+    "Sitting on testimonials section for 8s (spans a full 6.5s auto-advance cycle): page.scrollTop deviation = 0px; slider auto-advanced from 589 -> 803.",
+    "Lenis smooth scroll still functional: window.scrollTo({top: scrollHeight, behavior: 'smooth'}) reached bottom (end scrollY=6594, doc=7494, innerHeight=900)."
+  ],
+  "context_for_next_testing_agent": "Bug fix for testimonial-slider-triggering-page-scroll verified. The Lenis library hijacks any scrollIntoView / smooth scroll on the document, so any future carousels/sliders must call scrollTo({left,...}) or set scrollLeft directly on their own overflow container (never scrollIntoView on child cards). Test approach: assert on document.scrollingElement.scrollTop before/after slider interactions and also over an 8s idle window to catch the 6500ms auto-advance interval. Framer-motion useScroll warning on Home (heroRef) is unrelated and non-blocking.",
+  "rca_of_the_issue": "ROOT CAUSE: Previous TestimonialSlider used cards[clamped].scrollIntoView({inline:'start', block:'nearest'}). Lenis (smoothWheel:true, duration:1.6) intercepts scrollIntoView on any descendant of the smooth scroller and translates it into a full-page smooth scroll to place that card in the viewport — which is why auto-advance (every 6.5s) was silently scrolling the page down to the testimonials section, appearing to the user as 'suddenly jumping to the bottom'. FIX (Home.jsx L38-50): compute the offset (rectCard.left - rectEl.left) and call el.scrollTo({ left: el.scrollLeft + delta, behavior:'smooth' }) directly on the overflow-x-auto track container. This stays inside the element (Lenis does not intercept element-level scrolls of non-root containers) and no longer triggers a page scroll. REPRO before fix: open '/', wait ~6.5s idle at top -> page auto-scrolls down to testimonials. AFTER fix: page.scrollTop stayed at 0 for 10s idle; and 0 deviation across next/prev clicks and auto-advance."
+}

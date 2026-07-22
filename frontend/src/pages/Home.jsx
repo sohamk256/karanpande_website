@@ -41,9 +41,12 @@ function TestimonialSlider({ items }) {
     const el = trackRef.current;
     if (!el) return;
     const cards = el.querySelectorAll("[data-slider-card]");
-    if (cards[clamped]) {
-      cards[clamped].scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
-    }
+    const card = cards[clamped];
+    if (!card) return;
+    // Scroll ONLY the horizontal track — never the page.
+    const rectCard = card.getBoundingClientRect();
+    const rectEl = el.getBoundingClientRect();
+    el.scrollTo({ left: el.scrollLeft + rectCard.left - rectEl.left, behavior: "smooth" });
   };
 
   // auto-advance

@@ -104,6 +104,10 @@ body {
 
 ::selection { background: var(--copper); color: var(--cream); }
 
+/* Hide horizontal scrollbar for sliders */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { scrollbar-width: none; }
+
 /* Buttons */
 .btn-pill {
     display: inline-flex; align-items: center; gap: 0.6rem;

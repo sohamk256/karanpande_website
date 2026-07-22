@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowUpRight, Quote, Star, Camera, Film, Sparkles } from "lucide-react";
+import {
+  ArrowUpRight, Quote, Star, Camera, Film, Sparkles,
+  ChevronLeft, ChevronRight,
+} from "lucide-react";
 import RevealHeading from "../components/site/RevealHeading";
 import { FadeUp } from "../components/site/Reveal";
 import { fetchAllAlbums, fetchAllMedia, fetchTestimonials } from "../lib/api";
@@ -10,7 +13,7 @@ import { useSettings } from "../lib/settings";
 const CHAPTERS = [
   { n: "01", title: "Approach", body: "I photograph like I&rsquo;d remember it — half poem, half document. Weddings unfold on their own choreography; I move quietly, keep the lens close, and let the story lead." },
   { n: "02", title: "Craft", body: "Grain, warmth, and honest light. Every frame is graded to feel like a page from a private album — not a preset, but a memory colour that belongs to the two of you." },
-  { n: "03", title: "Delivery", body: "Hand-picked photographs, a printed proof book, and a cinematic film scored to a piece of music you&rsquo;ll love for decades. That&rsquo;s the shape of a shoot with me." },
+  { n: "03", title: "Delivery", body: "Hand-picked photographs, a printed proof book, and a cinematic film scored to a piece of music you&rsquo;ll love for decades." },
 ];
 
 const SERVICES = [
@@ -20,12 +23,166 @@ const SERVICES = [
 ];
 
 const STATS = [
-  { n: "120+", l: "Weddings" },
-  { n: "38", l: "Cities" },
+  { n: "120+", l: "Weddings shot" },
+  { n: "38", l: "Cities travelled" },
   { n: "6", l: "Years shooting" },
-  { n: "5.0", l: "Avg. rating" },
+  { n: "5.0", l: "Average rating" },
 ];
 
+/* ----------------------------- Testimonial slider ----------------------------- */
+function TestimonialSlider({ items }) {
+  const trackRef = useRef(null);
+  const [idx, setIdx] = useState(0);
+  const count = items.length;
+
+  const scrollToIdx = (n) => {
+    const clamped = ((n % count) + count) % count;
+    setIdx(clamped);
+    const el = trackRef.current;
+    if (!el) return;
+    const cards = el.querySelectorAll("[data-slider-card]");
+    if (cards[clamped]) {
+      cards[clamped].scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+    }
+  };
+
+  // auto-advance
+  useEffect(() => {
+    if (count === 0) return;
+    const id = setInterval(() => scrollToIdx(idx + 1), 6500);
+    return () => clearInterval(id);
+    // eslint-disable-next-line
+  }, [idx, count]);
+
+  if (count === 0) return null;
+
+  return (
+    <div className="mt-12 md:mt-16" data-testid="testimonial-slider">
+      <div
+        ref={trackRef}
+        className="flex gap-6 md:gap-8 overflow-x-auto pb-6 snap-x snap-mandatory -mx-6 md:-mx-10 px-6 md:px-10"
+        style={{ scrollbarWidth: "none" }}
+      >
+        {items.map((t, i) => (
+          <motion.article
+            key={t.id}
+            data-slider-card
+            data-testid={`testimonial-${i + 1}`}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
+            className="snap-start shrink-0 w-[86%] sm:w-[70%] md:w-[46%] lg:w-[38%] bg-[color:var(--cream)] text-[color:var(--ink)] p-8 md:p-10 flex flex-col"
+          >
+            <Quote size={30} className="text-[color:var(--copper)] mb-5" />
+            <p className="font-serif italic text-2xl md:text-3xl leading-[1.25]">
+              &ldquo;{t.quote}&rdquo;
+            </p>
+            <div className="mt-auto pt-8">
+              <div className="border-t border-[color:var(--ink)]/10 pt-6 flex items-center justify-between">
+                <div>
+                  <div className="font-serif text-xl">{t.author}</div>
+                  <div className="text-[10px] tracking-[0.28em] uppercase text-[color:var(--ink)]/60 mt-1">{t.role}</div>
+                </div>
+                <div className="flex gap-1 text-[color:var(--copper)]">
+                  {[...Array(t.rating || 5)].map((_, i) => <Star key={i} size={12} fill="currentColor" />)}
+                </div>
+              </div>
+            </div>
+          </motion.article>
+        ))}
+      </div>
+
+      <div className="mt-8 flex items-center gap-4">
+        <div className="flex gap-2">
+          <button
+            onClick={() => scrollToIdx(idx - 1)}
+            data-testid="testimonial-prev"
+            className="w-12 h-12 rounded-full border border-[color:var(--cream)]/40 flex items-center justify-center hover:bg-[color:var(--cream)] hover:text-[color:var(--sage-deep)] transition-colors"
+            aria-label="Previous"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            onClick={() => scrollToIdx(idx + 1)}
+            data-testid="testimonial-next"
+            className="w-12 h-12 rounded-full border border-[color:var(--cream)]/40 flex items-center justify-center hover:bg-[color:var(--cream)] hover:text-[color:var(--sage-deep)] transition-colors"
+            aria-label="Next"
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
+        <div className="flex-1 h-px bg-[color:var(--cream)]/20 relative overflow-hidden">
+          <motion.div
+            className="absolute top-0 left-0 h-full bg-[color:var(--copper)]"
+            animate={{ width: `${((idx + 1) / count) * 100}%` }}
+            transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+          />
+        </div>
+        <div className="eyebrow text-[color:var(--cream)]/70">
+          {String(idx + 1).padStart(2, "0")} / {String(count).padStart(2, "0")}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ----------------------------- Featured collage ----------------------------- */
+function FeaturedCollage({ frames }) {
+  if (frames.length === 0) return null;
+  const [f1, f2, f3, f4, f5, f6] = frames;
+
+  const cap = (i, label) => (
+    <div className="mt-3 flex items-center justify-between text-[10px] tracking-[0.28em] uppercase text-[color:var(--ink)]/60">
+      <span>{label}</span>
+      <span className="text-[color:var(--copper)]">Nº {String(i).padStart(2, "0")}</span>
+    </div>
+  );
+
+  return (
+    <div className="grid grid-cols-12 gap-4 md:gap-6">
+      {/* Row 1 */}
+      {f1 && (
+        <FadeUp className="col-span-12 md:col-span-7">
+          <figure>
+            <div className="img-frame aspect-[5/7]"><img src={f1.url} alt="Featured" /></div>
+            {cap(1, f1.title || "Wedding")}
+          </figure>
+        </FadeUp>
+      )}
+      <div className="col-span-12 md:col-span-5 flex flex-col gap-4 md:gap-6">
+        {f2 && (
+          <FadeUp delay={0.06}>
+            <figure>
+              <div className="img-frame aspect-[16/11]"><img src={f2.url} alt="Featured" /></div>
+              {cap(2, f2.title || "Pre-Wedding")}
+            </figure>
+          </FadeUp>
+        )}
+        {f3 && (
+          <FadeUp delay={0.12}>
+            <figure>
+              <div className="img-frame aspect-[16/11]"><img src={f3.url} alt="Featured" /></div>
+              {cap(3, f3.title || "Cinematic")}
+            </figure>
+          </FadeUp>
+        )}
+      </div>
+
+      {/* Row 2 — three tall portraits */}
+      {[f4, f5, f6].filter(Boolean).map((f, i) => (
+        <FadeUp key={f.id || i} delay={0.16 + i * 0.05} className="col-span-12 md:col-span-4">
+          <figure>
+            <div className="img-frame aspect-[3/4]"><img src={f.url} alt="Featured" /></div>
+            {cap(4 + i, f.title || "Frame")}
+          </figure>
+        </FadeUp>
+      ))}
+    </div>
+  );
+}
+
+/* ---------------------------------- Home page ---------------------------------- */
 export default function Home() {
   const [albums, setAlbums] = useState([]);
   const [media, setMedia] = useState([]);
@@ -51,12 +208,15 @@ export default function Home() {
   const pre = media.filter((m) => m.category === "pre-wedding");
   const cine = media.filter((m) => m.category === "cinematic");
 
-  const feat1 = wedding[0]?.url;
-  const feat2 = pre[0]?.url;
-  const feat3 = wedding[2]?.url || wedding[1]?.url;
-  const feat4 = pre[2]?.url || pre[1]?.url;
-  const feat5 = wedding[3]?.url;
-  const feat6 = cine[0]?.poster;
+  // Assemble featured frames (mix categories, prefer titled items)
+  const featured = [
+    wedding[0],
+    pre[0],
+    { ...(cine[0] || {}), url: cine[0]?.poster },
+    wedding[2] || wedding[1],
+    pre[2] || pre[1],
+    wedding[3],
+  ].filter((f) => f && f.url);
 
   return (
     <div data-testid="home-page">
@@ -112,75 +272,85 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Editorial index (replaces marquee) */}
-      <section className="bg-[color:var(--cream)] border-y border-[color:var(--ink)]/10">
-        <div className="mx-auto max-w-[1500px] px-6 md:px-10 py-14 md:py-16 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
-          {[
-            { n: "01", title: "Weddings", sub: "Full-day, editorial coverage of Indian weddings — mandap to reception." },
-            { n: "02", title: "Pre-Wedding", sub: "Story shoots outdoors, on location, or somewhere quietly meaningful." },
-            { n: "03", title: "Cinematic", sub: "Feature-length wedding films &amp; social teasers, cut like short cinema." },
-          ].map((s, i) => (
-            <FadeUp key={s.n} delay={i * 0.06}>
-              <div className="flex items-start gap-5 md:gap-6 md:border-l md:first:border-l-0 md:pl-8 md:first:pl-0 border-[color:var(--ink)]/10">
-                <span className="font-serif italic text-4xl md:text-5xl text-[color:var(--copper)] leading-none">{s.n}</span>
+      {/* ---------- FEATURED COLLAGE — directly under the hero ---------- */}
+      <section className="mx-auto max-w-[1600px] px-6 md:px-10 py-20 md:py-28" data-testid="featured-section">
+        <FadeUp>
+          <div className="flex items-end justify-between mb-10 md:mb-16 gap-4 flex-wrap">
+            <div>
+              <div className="eyebrow">Selected frames</div>
+              <h2 className="font-serif text-5xl md:text-6xl mt-3 tracking-tight">A recent index.</h2>
+            </div>
+            <Link to="/wedding" className="btn-pill" data-testid="featured-see-all">
+              See All Weddings <ArrowUpRight size={14} />
+            </Link>
+          </div>
+        </FadeUp>
+        <FeaturedCollage frames={featured} />
+      </section>
+
+      {/* ---------- Category folders / Albums ---------- */}
+      <section className="bg-[color:var(--cream-2)] py-24 md:py-32 border-t border-[color:var(--ink)]/10" data-testid="folders-section">
+        <div className="mx-auto max-w-[1500px] px-6 md:px-10">
+          <FadeUp>
+            <div className="eyebrow">Bodies of work</div>
+            <h2 className="font-serif text-5xl md:text-6xl mt-3 tracking-tight max-w-3xl">Three folders. One quiet voice.</h2>
+            <p className="mt-5 max-w-xl text-[color:var(--ink)]/70 text-base md:text-lg">
+              Each folder holds a set of couples&rsquo; stories — open any album to see the frames in full.
+            </p>
+          </FadeUp>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 mt-14">
+            {[
+              { to: "/wedding", title: "Weddings", n: "01", img: wedding[0]?.url, count: weddingAlbums.length, testid: "cat-wedding" },
+              { to: "/pre-wedding", title: "Pre-Wedding", n: "02", img: pre[0]?.url, count: preAlbums.length, testid: "cat-prewedding" },
+              { to: "/cinematic", title: "Cinematic", n: "03", img: cine[0]?.poster, count: cineAlbums.length, testid: "cat-cinematic" },
+            ].map((c, i) => (
+              <FadeUp key={c.to} delay={i * 0.08}>
+                <Link to={c.to} data-testid={c.testid} className="group block">
+                  <div className="img-frame aspect-[4/5] mb-4">{c.img && <img src={c.img} alt={c.title} />}</div>
+                  <div className="flex items-baseline justify-between">
+                    <h3 className="font-serif text-3xl md:text-4xl">{c.title}</h3>
+                    <span className="text-[color:var(--copper)] font-serif text-xl">{c.n}</span>
+                  </div>
+                  <div className="mt-2 flex items-center gap-2 text-[11px] tracking-[0.3em] uppercase text-[color:var(--ink)]/70 group-hover:text-[color:var(--copper)] transition-colors">
+                    {c.count} {c.count === 1 ? "album" : "albums"} <ArrowUpRight size={12} />
+                  </div>
+                </Link>
+              </FadeUp>
+            ))}
+          </div>
+
+          {/* Small manifesto under the albums */}
+          <div className="mt-20 md:mt-28" data-testid="manifesto-section">
+            <FadeUp>
+              <div className="flex items-baseline justify-between flex-wrap gap-3">
                 <div>
-                  <h3 className="font-serif italic text-3xl md:text-4xl leading-tight">{s.title}</h3>
-                  <p
-                    className="mt-3 text-[color:var(--ink)]/70 text-sm md:text-base leading-relaxed max-w-xs"
-                    dangerouslySetInnerHTML={{ __html: s.sub }}
-                  />
+                  <div className="eyebrow">A brief manifesto</div>
+                  <h3 className="font-serif italic text-2xl md:text-3xl mt-2">Three ideas that shape the work.</h3>
                 </div>
               </div>
             </FadeUp>
-          ))}
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="mx-auto max-w-[1500px] px-6 md:px-10 py-20 md:py-28">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-          {STATS.map((s, i) => (
-            <FadeUp key={s.l} delay={i * 0.06}>
-              <div className="border-t border-[color:var(--ink)]/15 pt-6">
-                <div className="font-serif text-6xl md:text-7xl leading-none">{s.n}</div>
-                <div className="mt-3 eyebrow">{s.l}</div>
-              </div>
-            </FadeUp>
-          ))}
-        </div>
-      </section>
-
-      {/* Manifesto */}
-      <section className="mx-auto max-w-[1500px] px-6 md:px-10 pb-24 md:pb-40">
-        <div className="grid grid-cols-12 gap-6 md:gap-10">
-          <FadeUp className="col-span-12 md:col-span-4">
-            <div className="eyebrow">A brief manifesto</div>
-            <h2 className="font-serif text-5xl md:text-6xl leading-[0.95] mt-6 tracking-tight">
-              Three ideas<br /><em className="text-[color:var(--sage-deep)]">that shape</em><br />the work.
-            </h2>
-          </FadeUp>
-          <div className="col-span-12 md:col-span-8 md:pl-10">
-            <div className="hairline" />
-            {CHAPTERS.map((c, i) => (
-              <FadeUp delay={i * 0.08} key={c.n}>
-                <div className="grid grid-cols-12 gap-4 py-10 md:py-14 border-b border-[color:var(--ink)]/10">
-                  <div className="col-span-3 md:col-span-2 font-serif text-3xl md:text-4xl text-[color:var(--copper)]">{c.n}</div>
-                  <div className="col-span-9 md:col-span-10">
-                    <h3 className="font-serif text-3xl md:text-4xl mb-3">{c.title}</h3>
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
+              {CHAPTERS.map((c, i) => (
+                <FadeUp key={c.n} delay={i * 0.06}>
+                  <div className="border-t border-[color:var(--ink)]/15 pt-5">
+                    <div className="flex items-baseline gap-3">
+                      <span className="font-serif text-2xl text-[color:var(--copper)]">{c.n}</span>
+                      <h4 className="font-serif text-2xl">{c.title}</h4>
+                    </div>
                     <p
-                      className="text-[color:var(--ink)]/75 text-base md:text-lg leading-relaxed max-w-xl"
+                      className="mt-3 text-sm text-[color:var(--ink)]/70 leading-relaxed"
                       dangerouslySetInnerHTML={{ __html: c.body }}
                     />
                   </div>
-                </div>
-              </FadeUp>
-            ))}
+                </FadeUp>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* About Karan */}
-      <section className="bg-[color:var(--cream-2)] border-t border-[color:var(--ink)]/10 py-24 md:py-40" data-testid="about-section">
+      {/* ---------- About Karan (with experience/stats embedded) ---------- */}
+      <section className="py-24 md:py-40" data-testid="about-section">
         <div className="mx-auto max-w-[1500px] px-6 md:px-10 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-start">
           <FadeUp className="md:col-span-5">
             <div className="img-frame aspect-[4/5]">
@@ -218,29 +388,21 @@ export default function Home() {
               </p>
             </FadeUp>
 
+            {/* Experience / stats moved into About */}
             <FadeUp delay={0.24}>
-              <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 gap-6 border-t border-[color:var(--ink)]/15 pt-8">
-                <div>
-                  <div className="eyebrow">Based in</div>
-                  <div className="font-serif text-2xl mt-2">Sambhaji Nagar</div>
-                </div>
-                <div>
-                  <div className="eyebrow">Travels</div>
-                  <div className="font-serif text-2xl mt-2">Worldwide</div>
-                </div>
-                <div>
-                  <div className="eyebrow">Language</div>
-                  <div className="font-serif text-2xl mt-2">EN · HI · MR</div>
-                </div>
+              <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 border-t border-[color:var(--ink)]/15 pt-8" data-testid="about-stats">
+                {STATS.map((s) => (
+                  <div key={s.l}>
+                    <div className="font-serif text-4xl md:text-5xl leading-none">{s.n}</div>
+                    <div className="mt-3 eyebrow">{s.l}</div>
+                  </div>
+                ))}
               </div>
             </FadeUp>
 
             <FadeUp delay={0.32}>
-              <div className="mt-12 flex items-center gap-6">
-                <span
-                  className="font-serif italic text-4xl md:text-5xl text-[color:var(--copper)] leading-none"
-                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                >
+              <div className="mt-12 flex items-center gap-6 flex-wrap">
+                <span className="font-serif italic text-4xl md:text-5xl text-[color:var(--copper)] leading-none">
                   Karan Pande
                 </span>
                 <span className="eyebrow text-[color:var(--ink)]/50">— Photographer &amp; Founder</span>
@@ -250,99 +412,46 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured asymmetric grid */}
-      <section className="mx-auto max-w-[1600px] px-6 md:px-10 pb-24">
-        <FadeUp>
-          <div className="flex items-end justify-between mb-10 md:mb-16">
-            <div>
-              <div className="eyebrow">Selected frames</div>
-              <h2 className="font-serif text-5xl md:text-6xl mt-3 tracking-tight">A recent index.</h2>
-            </div>
-            <Link to="/wedding" className="btn-pill hidden md:inline-flex" data-testid="featured-see-all">
-              See All Weddings <ArrowUpRight size={14} />
-            </Link>
-          </div>
-        </FadeUp>
-
-        <div className="grid grid-cols-12 gap-3 md:gap-5">
-          {feat1 && <FadeUp className="col-span-12 md:col-span-8"><div className="img-frame aspect-[16/10]"><img src={feat1} alt="Wedding" /></div></FadeUp>}
-          {feat2 && <FadeUp delay={0.05} className="col-span-12 md:col-span-4"><div className="img-frame aspect-[4/5]"><img src={feat2} alt="Pre-wedding" /></div></FadeUp>}
-          {feat3 && <FadeUp delay={0.05} className="col-span-6 md:col-span-3"><div className="img-frame aspect-[3/4]"><img src={feat3} alt="Wedding" /></div></FadeUp>}
-          {feat6 && <FadeUp delay={0.1} className="col-span-6 md:col-span-5"><div className="img-frame aspect-[4/3]"><img src={feat6} alt="Cinematic" /></div></FadeUp>}
-          {feat4 && <FadeUp delay={0.15} className="col-span-12 md:col-span-4"><div className="img-frame aspect-[16/11]"><img src={feat4} alt="Pre-wedding" /></div></FadeUp>}
-          {feat5 && <FadeUp delay={0.15} className="col-span-12 md:col-span-12"><div className="img-frame aspect-[21/9]"><img src={feat5} alt="Wedding" /></div></FadeUp>}
-        </div>
-      </section>
-
-      {/* Category folders */}
-      <section className="bg-[color:var(--cream-2)] py-24 md:py-32 border-t border-[color:var(--ink)]/10">
+      {/* ---------- Services ---------- */}
+      <section className="bg-[color:var(--cream-2)] border-t border-[color:var(--ink)]/10 py-24 md:py-32">
         <div className="mx-auto max-w-[1500px] px-6 md:px-10">
           <FadeUp>
-            <div className="eyebrow">Bodies of work</div>
-            <h2 className="font-serif text-5xl md:text-6xl mt-3 tracking-tight max-w-3xl">Three folders. One quiet voice.</h2>
-            <p className="mt-5 max-w-xl text-[color:var(--ink)]/70 text-base md:text-lg">Every folder holds a set of couples&rsquo; stories — open one to see the frames in full.</p>
+            <div className="eyebrow">What I offer</div>
+            <h2 className="font-serif text-5xl md:text-6xl mt-3 tracking-tight max-w-3xl">Made with care, delivered slowly.</h2>
           </FadeUp>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 mt-14">
-            {[
-              { to: "/wedding", title: "Weddings", n: "01", img: feat1, count: weddingAlbums.length, testid: "cat-wedding" },
-              { to: "/pre-wedding", title: "Pre-Wedding", n: "02", img: feat2, count: preAlbums.length, testid: "cat-prewedding" },
-              { to: "/cinematic", title: "Cinematic", n: "03", img: feat6, count: cineAlbums.length, testid: "cat-cinematic" },
-            ].map((c, i) => (
-              <FadeUp key={c.to} delay={i * 0.08}>
-                <Link to={c.to} data-testid={c.testid} className="group block">
-                  <div className="img-frame aspect-[4/5] mb-4">{c.img && <img src={c.img} alt={c.title} />}</div>
-                  <div className="flex items-baseline justify-between">
-                    <h3 className="font-serif text-3xl md:text-4xl">{c.title}</h3>
-                    <span className="text-[color:var(--copper)] font-serif text-xl">{c.n}</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-14">
+            {SERVICES.map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <FadeUp key={s.title} delay={i * 0.08}>
+                  <div className="h-full border border-[color:var(--ink)]/12 bg-[color:var(--surface)] p-8 md:p-10 flex flex-col">
+                    <div className="flex items-center justify-between">
+                      <Icon size={22} className="text-[color:var(--copper)]" />
+                      <span className="font-serif text-[color:var(--copper)] text-xl">{s.tag}</span>
+                    </div>
+                    <h3 className="font-serif text-3xl md:text-4xl mt-8">{s.title}</h3>
+                    <p
+                      className="mt-4 text-[color:var(--ink)]/75 leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: s.desc }}
+                    />
+                    <ul className="mt-6 space-y-2 text-sm text-[color:var(--ink)]/70 border-t border-[color:var(--ink)]/10 pt-6">
+                      {s.bullets.map((b) => (
+                        <li key={b} className="flex items-start gap-2">
+                          <span className="text-[color:var(--copper)]">◆</span>
+                          <span dangerouslySetInnerHTML={{ __html: b }} />
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <div className="mt-2 flex items-center gap-2 text-[11px] tracking-[0.3em] uppercase text-[color:var(--ink)]/70 group-hover:text-[color:var(--copper)] transition-colors">
-                    {c.count} albums <ArrowUpRight size={12} />
-                  </div>
-                </Link>
-              </FadeUp>
-            ))}
+                </FadeUp>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Services */}
-      <section className="mx-auto max-w-[1500px] px-6 md:px-10 py-28 md:py-40">
-        <FadeUp>
-          <div className="eyebrow">What I offer</div>
-          <h2 className="font-serif text-5xl md:text-6xl mt-3 tracking-tight max-w-3xl">Made with care, delivered slowly.</h2>
-        </FadeUp>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-14">
-          {SERVICES.map((s, i) => {
-            const Icon = s.icon;
-            return (
-              <FadeUp key={s.title} delay={i * 0.08}>
-                <div className="h-full border border-[color:var(--ink)]/12 bg-[color:var(--surface)] p-8 md:p-10 flex flex-col">
-                  <div className="flex items-center justify-between">
-                    <Icon size={22} className="text-[color:var(--copper)]" />
-                    <span className="font-serif text-[color:var(--copper)] text-xl">{s.tag}</span>
-                  </div>
-                  <h3 className="font-serif text-3xl md:text-4xl mt-8">{s.title}</h3>
-                  <p
-                    className="mt-4 text-[color:var(--ink)]/75 leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: s.desc }}
-                  />
-                  <ul className="mt-6 space-y-2 text-sm text-[color:var(--ink)]/70 border-t border-[color:var(--ink)]/10 pt-6">
-                    {s.bullets.map((b) => (
-                      <li key={b} className="flex items-start gap-2">
-                        <span className="text-[color:var(--copper)]">◆</span>
-                        <span dangerouslySetInnerHTML={{ __html: b }} />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </FadeUp>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Happy Customers / Testimonials */}
-      <section className="bg-[color:var(--sage-deep)] text-[color:var(--cream)] py-28 md:py-40" data-testid="testimonials-section">
+      {/* ---------- Testimonials — SLIDER ---------- */}
+      <section className="bg-[color:var(--sage-deep)] text-[color:var(--cream)] py-24 md:py-40" data-testid="testimonials-section">
         <div className="mx-auto max-w-[1500px] px-6 md:px-10">
           <FadeUp>
             <div className="flex items-end justify-between flex-wrap gap-6">
@@ -359,30 +468,7 @@ export default function Home() {
             </div>
           </FadeUp>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-16">
-            {testimonials.map((t, i) => (
-              <FadeUp key={t.id} delay={i * 0.08}>
-                <article
-                  data-testid={`testimonial-${i + 1}`}
-                  className="relative bg-[color:var(--cream)] text-[color:var(--ink)] p-8 md:p-10 h-full flex flex-col"
-                >
-                  <Quote size={32} className="text-[color:var(--copper)] mb-6" />
-                  <p className="font-serif text-2xl md:text-3xl leading-[1.25] italic">
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                  <div className="mt-auto pt-8 flex items-center justify-between border-t border-[color:var(--ink)]/10 mt-8">
-                    <div>
-                      <div className="font-serif text-xl">{t.author}</div>
-                      <div className="text-[10px] tracking-[0.28em] uppercase text-[color:var(--ink)]/60 mt-1">{t.role}</div>
-                    </div>
-                    <div className="flex gap-1 text-[color:var(--copper)]">
-                      {[...Array(t.rating || 5)].map((_, i) => <Star key={i} size={12} fill="currentColor" />)}
-                    </div>
-                  </div>
-                </article>
-              </FadeUp>
-            ))}
-          </div>
+          <TestimonialSlider items={testimonials} />
 
           {testimonials.length === 0 && (
             <p className="mt-12 text-[color:var(--cream)]/70">Testimonials coming soon.</p>
@@ -390,7 +476,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Closing CTA */}
+      {/* ---------- Closing CTA ---------- */}
       <section className="mx-auto max-w-[1500px] px-6 md:px-10 py-32 md:py-44">
         <FadeUp>
           <div className="grid grid-cols-12 gap-6 items-end">

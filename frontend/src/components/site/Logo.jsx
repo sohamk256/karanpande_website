@@ -1,81 +1,98 @@
 /**
- * Shutter Shots by KP — brand logo.
- * variant: "full" | "icon" | "mono"
- * color:   any CSS colour (defaults to currentColor)
+ * Shutter Shots by KP — brand mark.
+ * A hexagonal aperture inside a ticked lens ring with a crosshair —
+ * a proper camera symbol, not a monogram.
+ *
+ * variant: "full" | "icon"
  */
-export default function Logo({ variant = "full", className = "", color = "currentColor" }) {
-  const stroke = color;
+export default function Logo({ variant = "full", className = "" }) {
+  const ticks = Array.from({ length: 12 }, (_, i) => {
+    const rad = (i * 30 * Math.PI) / 180;
+    const outer = 28;
+    const inner = i % 3 === 0 ? 23.5 : 25.5;
+    const w = i % 3 === 0 ? 1.1 : 0.65;
+    const opacity = i % 3 === 0 ? 0.9 : 0.5;
+    const cx = 32, cy = 32;
+    return (
+      <line
+        key={i}
+        x1={cx + Math.cos(rad) * outer}
+        y1={cy + Math.sin(rad) * outer}
+        x2={cx + Math.cos(rad) * inner}
+        y2={cy + Math.sin(rad) * inner}
+        stroke="currentColor"
+        strokeWidth={w}
+        opacity={opacity}
+      />
+    );
+  });
+
+  const badge = (
+    <g transform="translate(2, 4)">
+      {/* Outer ring */}
+      <circle cx="32" cy="32" r="30" stroke="currentColor" strokeWidth="1.1" fill="none" />
+      {ticks}
+      {/* Six subtle aperture blades */}
+      {[0, 60, 120, 180, 240, 300].map((deg) => (
+        <path
+          key={deg}
+          d="M 32 32 L 32 14 A 18 18 0 0 1 47.588 23 Z"
+          fill="currentColor"
+          opacity="0.11"
+          transform={`rotate(${deg} 32 32)`}
+        />
+      ))}
+      {/* Inner hexagon */}
+      <polygon
+        points="32,14 47.588,23 47.588,41 32,50 16.412,41 16.412,23"
+        stroke="currentColor"
+        strokeWidth="0.85"
+        fill="none"
+        opacity="0.55"
+      />
+      {/* Crosshair */}
+      <line x1="32" y1="24" x2="32" y2="40" stroke="currentColor" strokeWidth="0.7" opacity="0.7" />
+      <line x1="24" y1="32" x2="40" y2="32" stroke="currentColor" strokeWidth="0.7" opacity="0.7" />
+      {/* Center */}
+      <circle cx="32" cy="32" r="2.6" fill="currentColor" />
+    </g>
+  );
 
   if (variant === "icon") {
     return (
-      <svg viewBox="0 0 64 64" className={className} fill="none" aria-label="Shutter Shots by KP">
-        <circle cx="32" cy="32" r="30" stroke={stroke} strokeWidth="1.2" />
-        {/* aperture blades — 6 triangular slivers around center */}
-        {[0, 60, 120, 180, 240, 300].map((deg) => (
-          <path
-            key={deg}
-            d="M 32 32 L 32 6 A 26 26 0 0 1 54.516 19 Z"
-            fill={stroke}
-            opacity="0.14"
-            transform={`rotate(${deg} 32 32)`}
-          />
-        ))}
-        <polygon points="32,8 52,20 52,44 32,56 12,44 12,20" stroke={stroke} strokeWidth="0.9" fill="none" opacity="0.5" />
-        <circle cx="32" cy="32" r="9.5" fill={stroke} />
-        <text
-          x="32" y="36" textAnchor="middle"
-          fontFamily="'Cormorant Garamond', serif"
-          fontStyle="italic" fontWeight="700"
-          fontSize="12" fill="var(--cream)"
-        >KP</text>
+      <svg viewBox="0 0 68 72" className={className} fill="none" aria-label="Shutter Shots by Karan Pande">
+        {badge}
       </svg>
     );
   }
 
-  // full
   return (
-    <svg viewBox="0 0 300 64" className={className} fill="none" aria-label="Shutter Shots by KP">
-      {/* Badge */}
-      <g>
-        <circle cx="32" cy="32" r="28" stroke={stroke} strokeWidth="1.1" />
-        {[0, 60, 120, 180, 240, 300].map((deg) => (
-          <path
-            key={deg}
-            d="M 32 32 L 32 8 A 24 24 0 0 1 52.784 20 Z"
-            fill={stroke}
-            opacity="0.13"
-            transform={`rotate(${deg} 32 32)`}
-          />
-        ))}
-        <polygon points="32,10 50,20 50,44 32,54 14,44 14,20" stroke={stroke} strokeWidth="0.85" fill="none" opacity="0.55" />
-        <circle cx="32" cy="32" r="8.6" fill={stroke} />
-        <text
-          x="32" y="35.5" textAnchor="middle"
-          fontFamily="'Cormorant Garamond', serif"
-          fontStyle="italic" fontWeight="700"
-          fontSize="11" fill="var(--cream)"
-        >KP</text>
-      </g>
+    <svg viewBox="0 0 340 72" className={className} fill="none" aria-label="Shutter Shots by Karan Pande">
+      {badge}
 
       {/* Divider hairline */}
-      <line x1="70" y1="14" x2="70" y2="50" stroke={stroke} strokeWidth="0.7" opacity="0.35" />
+      <line x1="86" y1="16" x2="86" y2="58" stroke="currentColor" strokeWidth="0.6" opacity="0.3" />
 
       {/* Wordmark */}
-      <g transform="translate(82, 0)">
+      <g transform="translate(100, 0)">
         <text
-          x="0" y="30"
-          fontFamily="'Cormorant Garamond', serif"
-          fontStyle="italic" fontWeight="500"
-          fontSize="26" fill={stroke}
-          letterSpacing="0.3"
+          x="0" y="38"
+          fontFamily="'Cormorant Garamond', 'Times New Roman', serif"
+          fontStyle="italic"
+          fontWeight="500"
+          fontSize="30"
+          fill="currentColor"
+          letterSpacing="0.4"
         >Shutter Shots</text>
         <text
-          x="2" y="48"
-          fontFamily="'Manrope', sans-serif"
-          fontSize="8" fill={stroke}
-          letterSpacing="5.2" opacity="0.72"
+          x="3" y="58"
+          fontFamily="'Manrope', 'Helvetica Neue', sans-serif"
+          fontSize="9"
+          fill="currentColor"
+          letterSpacing="2.6"
           fontWeight="600"
-        >B Y &#8202; K A R A N &#8202; P A N D E</text>
+          opacity="0.75"
+        >BY&#160;&#160;KARAN&#160;&#160;PANDE&#160;&#160;·&#160;&#160;PHOTOGRAPHY</text>
       </g>
     </svg>
   );

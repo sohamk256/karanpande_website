@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import Marquee from "react-fast-marquee";
 import { ArrowUpRight, Quote, Star, Camera, Film, Sparkles } from "lucide-react";
 import RevealHeading from "../components/site/RevealHeading";
 import { FadeUp } from "../components/site/Reveal";
@@ -113,16 +112,28 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Editorial Marquee */}
-      <section className="bg-[color:var(--cream)] border-y border-[color:var(--ink)]/10 py-10">
-        <Marquee speed={28} gradient={false} pauseOnHover>
-          <span className="marquee-track text-[6vw] md:text-[4.5vw] leading-none px-8 text-[color:var(--ink)]">
-            Weddings &nbsp;·&nbsp; Pre-Wedding &nbsp;·&nbsp; Cinematic Films &nbsp;·&nbsp;
-          </span>
-          <span className="marquee-track text-[6vw] md:text-[4.5vw] leading-none px-8 text-[color:var(--copper)]">
-            Sambhaji Nagar &nbsp;·&nbsp; Est. 2019 &nbsp;·&nbsp; Shutter Shots by KP &nbsp;·&nbsp;
-          </span>
-        </Marquee>
+      {/* Editorial index (replaces marquee) */}
+      <section className="bg-[color:var(--cream)] border-y border-[color:var(--ink)]/10">
+        <div className="mx-auto max-w-[1500px] px-6 md:px-10 py-14 md:py-16 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
+          {[
+            { n: "01", title: "Weddings", sub: "Full-day, editorial coverage of Indian weddings — mandap to reception." },
+            { n: "02", title: "Pre-Wedding", sub: "Story shoots outdoors, on location, or somewhere quietly meaningful." },
+            { n: "03", title: "Cinematic", sub: "Feature-length wedding films &amp; social teasers, cut like short cinema." },
+          ].map((s, i) => (
+            <FadeUp key={s.n} delay={i * 0.06}>
+              <div className="flex items-start gap-5 md:gap-6 md:border-l md:first:border-l-0 md:pl-8 md:first:pl-0 border-[color:var(--ink)]/10">
+                <span className="font-serif italic text-4xl md:text-5xl text-[color:var(--copper)] leading-none">{s.n}</span>
+                <div>
+                  <h3 className="font-serif italic text-3xl md:text-4xl leading-tight">{s.title}</h3>
+                  <p
+                    className="mt-3 text-[color:var(--ink)]/70 text-sm md:text-base leading-relaxed max-w-xs"
+                    dangerouslySetInnerHTML={{ __html: s.sub }}
+                  />
+                </div>
+              </div>
+            </FadeUp>
+          ))}
+        </div>
       </section>
 
       {/* Stats */}
@@ -164,6 +175,77 @@ export default function Home() {
                 </div>
               </FadeUp>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About Karan */}
+      <section className="bg-[color:var(--cream-2)] border-t border-[color:var(--ink)]/10 py-24 md:py-40" data-testid="about-section">
+        <div className="mx-auto max-w-[1500px] px-6 md:px-10 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-start">
+          <FadeUp className="md:col-span-5">
+            <div className="img-frame aspect-[4/5]">
+              <img
+                src="https://images.unsplash.com/photo-1554080353-a576cf803bda?auto=format&fit=crop&w=1200&q=80"
+                alt="Karan Pande — photographer"
+              />
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-3 text-[10px] tracking-[0.28em] uppercase text-[color:var(--ink)]/60">
+              <span>Sony · Canon</span>
+              <span>35mm · 85mm</span>
+              <span>Est. 2019</span>
+            </div>
+          </FadeUp>
+
+          <div className="md:col-span-7 md:pl-4">
+            <FadeUp>
+              <div className="eyebrow">About the photographer</div>
+              <h2 className="font-serif text-5xl md:text-6xl mt-3 tracking-tight leading-[0.98]">
+                Hello, I&rsquo;m <em className="text-[color:var(--sage-deep)]">Karan.</em>
+              </h2>
+            </FadeUp>
+            <FadeUp delay={0.08}>
+              <p className="mt-8 text-lg md:text-xl text-[color:var(--ink)]/80 leading-relaxed max-w-2xl">
+                I photograph weddings, pre-wedding stories, and cinematic films out of a small studio in
+                Sambhaji Nagar. Six years in, I&rsquo;m still moved by the same three things — first looks,
+                the last dance, and the way sunlight lands on a mother&rsquo;s hand.
+              </p>
+            </FadeUp>
+            <FadeUp delay={0.16}>
+              <p className="mt-6 text-base md:text-lg text-[color:var(--ink)]/70 leading-relaxed max-w-2xl">
+                My work sits somewhere between documentary and editorial. I don&rsquo;t direct much,
+                I don&rsquo;t re-shoot the vows, and I don&rsquo;t chase trends in colour. I photograph
+                what actually happens — quietly, on foot, and close enough to hear you laugh.
+              </p>
+            </FadeUp>
+
+            <FadeUp delay={0.24}>
+              <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 gap-6 border-t border-[color:var(--ink)]/15 pt-8">
+                <div>
+                  <div className="eyebrow">Based in</div>
+                  <div className="font-serif text-2xl mt-2">Sambhaji Nagar</div>
+                </div>
+                <div>
+                  <div className="eyebrow">Travels</div>
+                  <div className="font-serif text-2xl mt-2">Worldwide</div>
+                </div>
+                <div>
+                  <div className="eyebrow">Language</div>
+                  <div className="font-serif text-2xl mt-2">EN · HI · MR</div>
+                </div>
+              </div>
+            </FadeUp>
+
+            <FadeUp delay={0.32}>
+              <div className="mt-12 flex items-center gap-6">
+                <span
+                  className="font-serif italic text-4xl md:text-5xl text-[color:var(--copper)] leading-none"
+                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                >
+                  Karan Pande
+                </span>
+                <span className="eyebrow text-[color:var(--ink)]/50">— Photographer &amp; Founder</span>
+              </div>
+            </FadeUp>
           </div>
         </div>
       </section>

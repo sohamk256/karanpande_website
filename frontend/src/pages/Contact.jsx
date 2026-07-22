@@ -20,12 +20,13 @@ export default function Contact() {
   ];
 
   return (
-    <div className="pt-32 md:pt-40 pb-32" data-testid="contact-page">
-      <section className="mx-auto max-w-[1400px] px-6 md:px-10">
+    <div className="pt-28 md:pt-40 pb-24 md:pb-32" data-testid="contact-page">
+      <section className="mx-auto max-w-[1400px] px-5 md:px-10">
         <div className="eyebrow">Chapter 04 · The Enquiry</div>
         <RevealHeading
           lines={["Let's talk about", "your wedding."]}
-          className="font-serif italic text-[color:var(--ink)] text-[14vw] md:text-[10vw] leading-[0.9] mt-6 tracking-tight block"
+          className="font-serif italic text-[color:var(--ink)] leading-[0.9] mt-5 md:mt-6 tracking-tight block"
+          style={{ fontSize: "clamp(2.5rem, 9vw, 7rem)" }}
         />
         <FadeUp delay={0.6}>
           <p className="mt-10 max-w-xl text-lg leading-relaxed text-[color:var(--ink)]/75">
@@ -35,7 +36,7 @@ export default function Contact() {
         </FadeUp>
       </section>
 
-      <section className="mx-auto max-w-[1400px] px-6 md:px-10 mt-20">
+      <section className="mx-auto max-w-[1400px] px-5 md:px-10 mt-14 md:mt-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {contacts.map((c, i) => {
             const Icon = c.icon;
@@ -63,7 +64,7 @@ export default function Contact() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1400px] px-6 md:px-10 mt-24 md:mt-32">
+      <section className="mx-auto max-w-[1400px] px-5 md:px-10 mt-20 md:mt-32">
         <FadeUp>
           <div className="border-t border-[color:var(--sage-deep)]/15 pt-10 bg-[color:var(--sage-soft)] p-8 md:p-12 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>

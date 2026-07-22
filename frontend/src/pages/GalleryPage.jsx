@@ -31,15 +31,16 @@ export default function GalleryPage({ category, title, chapter, subtitle, next }
   const basePath = `/${category}`;
 
   return (
-    <div className="pt-32 md:pt-40 pb-24" data-testid={`gallery-${category}`}>
+    <div className="pt-28 md:pt-40 pb-20 md:pb-24" data-testid={`gallery-${category}`}>
       {/* Header */}
-      <section className="mx-auto max-w-[1600px] px-6 md:px-10">
+      <section className="mx-auto max-w-[1600px] px-5 md:px-10">
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-12 md:col-span-9">
             <div className="eyebrow">{chapter} · The Folder</div>
             <RevealHeading
               lines={[title]}
-              className="font-serif italic text-[color:var(--ink)] text-[14vw] md:text-[11vw] leading-[0.9] mt-6 tracking-tight block"
+              className="font-serif italic text-[color:var(--ink)] leading-[0.9] mt-5 md:mt-6 tracking-tight block"
+              style={{ fontSize: "clamp(3rem, 11vw, 8rem)" }}
             />
           </div>
           <div className="col-span-12 md:col-span-3 md:pt-6 md:text-right">
@@ -54,7 +55,8 @@ export default function GalleryPage({ category, title, chapter, subtitle, next }
       </section>
 
       {/* Albums */}
-      <section className="mx-auto max-w-[1600px] px-6 md:px-10 mt-20">
+      {/* Grid */}
+      <section className="mx-auto max-w-[1600px] px-5 md:px-10 mt-14 md:mt-20">
         {albums.length === 0 ? (
           <div className="py-32 text-center text-[color:var(--ink)]/50 border-y border-[color:var(--ink)]/10">
             <p className="font-serif italic text-3xl">Albums coming soon.</p>
@@ -105,7 +107,7 @@ export default function GalleryPage({ category, title, chapter, subtitle, next }
 
       {/* Next chapter */}
       {next && (
-        <section className="mx-auto max-w-[1600px] px-6 md:px-10 mt-32 md:mt-48">
+        <section className="mx-auto max-w-[1600px] px-5 md:px-10 mt-24 md:mt-48">
           <FadeUp>
             <div className="border-t border-[color:var(--ink)]/15 pt-10 flex items-end justify-between">
               <div>

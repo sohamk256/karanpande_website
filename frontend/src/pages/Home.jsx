@@ -256,7 +256,7 @@ export default function Home() {
           <div className="max-w-[1500px]">
             <RevealHeading
               className="font-serif italic text-[color:var(--cream)] leading-[0.92] tracking-tight block"
-              style={{ fontSize: "clamp(2.75rem, 10vw, 6.5rem)" }}
+              style={{ fontSize: "clamp(3.25rem, 10vw, 6.5rem)" }}
               lines={settings ? [settings.hero_headline_1, settings.hero_headline_2] : ["Weddings, held", "like heirlooms."]}
               delay={0.35}
               key={settings ? `${settings.hero_headline_1}-${settings.hero_headline_2}` : "hero"}
@@ -284,12 +284,12 @@ export default function Home() {
       </section>
 
       {/* ---------- FEATURED COLLAGE — directly under the hero, single viewport ---------- */}
-      <section className="mx-auto max-w-[1600px] px-6 md:px-10 py-14 md:py-10 md:min-h-screen md:flex md:flex-col md:justify-center" data-testid="featured-section">
+      <section className="mx-auto max-w-[1600px] px-5 md:px-10 py-10 md:py-10 md:min-h-screen md:flex md:flex-col md:justify-center" data-testid="featured-section">
         <FadeUp>
           <div className="flex items-end justify-between mb-6 md:mb-8 gap-4 flex-wrap">
             <div>
               <div className="eyebrow">Selected frames</div>
-              <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl mt-2 tracking-tight">A recent index.</h2>
+              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl mt-2 tracking-tight">A recent index.</h2>
             </div>
             <Link to="/wedding" className="btn-pill" data-testid="featured-see-all">
               See All Weddings <ArrowUpRight size={14} />
@@ -361,12 +361,12 @@ export default function Home() {
       </section>
 
       {/* ---------- About Karan (with experience/stats embedded) ---------- */}
-      <section className="py-24 md:py-40 bg-[color:var(--cream)]" data-testid="about-section">
-        <div className="mx-auto max-w-[1500px] px-6 md:px-10 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-start">
+      <section className="py-16 md:py-40 bg-[color:var(--cream)]" data-testid="about-section">
+        <div className="mx-auto max-w-[1500px] px-5 md:px-10 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-start">
           <FadeUp className="md:col-span-5">
             <div className="img-frame aspect-[4/5]">
               <img
-                src="https://images.unsplash.com/photo-1554080353-a576cf803bda?auto=format&fit=crop&w=1200&q=80"
+                src={settings?.about_photo_url || "https://images.unsplash.com/photo-1554080353-a576cf803bda?auto=format&fit=crop&w=1200&q=80"}
                 alt="Karan Pande — photographer"
               />
             </div>
@@ -380,22 +380,18 @@ export default function Home() {
           <div className="md:col-span-7 md:pl-4">
             <FadeUp>
               <div className="eyebrow">About the photographer</div>
-              <h2 className="font-serif text-5xl md:text-6xl mt-3 tracking-tight leading-[0.98]">
+              <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl mt-3 tracking-tight leading-[0.98]">
                 Hello, I&rsquo;m <em className="text-[color:var(--sage-deep)]">Karan.</em>
               </h2>
             </FadeUp>
             <FadeUp delay={0.08}>
-              <p className="mt-8 text-lg md:text-xl text-[color:var(--ink)]/80 leading-relaxed max-w-2xl">
-                I photograph weddings, pre-wedding stories, and cinematic films out of a small studio in
-                Sambhaji Nagar. Six years in, I&rsquo;m still moved by the same three things — first looks,
-                the last dance, and the way sunlight lands on a mother&rsquo;s hand.
+              <p className="mt-6 md:mt-8 text-base sm:text-lg md:text-xl text-[color:var(--ink)]/80 leading-relaxed max-w-2xl">
+                {settings?.about_bio_1}
               </p>
             </FadeUp>
             <FadeUp delay={0.16}>
-              <p className="mt-6 text-base md:text-lg text-[color:var(--ink)]/70 leading-relaxed max-w-2xl">
-                My work sits somewhere between documentary and editorial. I don&rsquo;t direct much,
-                I don&rsquo;t re-shoot the vows, and I don&rsquo;t chase trends in colour. I photograph
-                what actually happens — quietly, on foot, and close enough to hear you laugh.
+              <p className="mt-5 md:mt-6 text-sm sm:text-base md:text-lg text-[color:var(--ink)]/70 leading-relaxed max-w-2xl">
+                {settings?.about_bio_2}
               </p>
             </FadeUp>
 
@@ -424,13 +420,13 @@ export default function Home() {
       </section>
 
       {/* ---------- Sage pull-quote band ---------- */}
-      <section className="bg-[color:var(--sage-deep)] text-[color:var(--cream)] py-20 md:py-28" data-testid="pullquote-band">
-        <div className="mx-auto max-w-[1500px] px-6 md:px-10 grid grid-cols-12 gap-6 items-center">
+      <section className="bg-[color:var(--sage-deep)] text-[color:var(--cream)] py-14 md:py-28" data-testid="pullquote-band">
+        <div className="mx-auto max-w-[1500px] px-5 md:px-10 grid grid-cols-12 gap-6 items-center">
           <div className="col-span-12 md:col-span-2">
             <div className="eyebrow text-[color:var(--copper)]">Field notes</div>
           </div>
           <div className="col-span-12 md:col-span-10">
-            <p className="font-serif italic text-3xl md:text-5xl leading-[1.1] tracking-tight">
+            <p className="font-serif italic text-2xl sm:text-3xl md:text-5xl leading-[1.15] md:leading-[1.1] tracking-tight">
               &ldquo;A good wedding photograph isn&rsquo;t the biggest moment —
               it&rsquo;s the second right after it, when nobody&rsquo;s watching.&rdquo;
             </p>
@@ -478,13 +474,13 @@ export default function Home() {
       </section>
 
       {/* ---------- Testimonials — SLIDER ---------- */}
-      <section className="bg-[color:var(--sage-deep)] text-[color:var(--cream)] py-24 md:py-40" data-testid="testimonials-section">
-        <div className="mx-auto max-w-[1500px] px-6 md:px-10">
+      <section className="bg-[color:var(--sage-deep)] text-[color:var(--cream)] py-16 md:py-40" data-testid="testimonials-section">
+        <div className="mx-auto max-w-[1500px] px-5 md:px-10">
           <FadeUp>
             <div className="flex items-end justify-between flex-wrap gap-6">
               <div>
                 <div className="eyebrow text-[color:var(--copper)]">Happy couples</div>
-                <h2 className="font-serif italic text-5xl md:text-7xl mt-3 tracking-tight leading-[0.95]">
+                <h2 className="font-serif italic text-4xl sm:text-5xl md:text-7xl mt-3 tracking-tight leading-[0.95]">
                   Notes from<br />the families.
                 </h2>
               </div>
@@ -504,12 +500,12 @@ export default function Home() {
       </section>
 
       {/* ---------- Closing CTA ---------- */}
-      <section className="mx-auto max-w-[1500px] px-6 md:px-10 py-32 md:py-44">
+      <section className="mx-auto max-w-[1500px] px-5 md:px-10 py-20 md:py-44">
         <FadeUp>
           <div className="grid grid-cols-12 gap-6 items-end">
             <div className="col-span-12 md:col-span-8">
               <div className="eyebrow">Ready when you are</div>
-              <p className="font-serif italic text-4xl md:text-7xl leading-[1.02] tracking-tight mt-4">
+              <p className="font-serif italic text-3xl sm:text-4xl md:text-7xl leading-[1.05] md:leading-[1.02] tracking-tight mt-4">
                 Let&rsquo;s make photographs<br />you&rsquo;ll open in twenty years.
               </p>
             </div>

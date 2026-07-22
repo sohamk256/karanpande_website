@@ -169,6 +169,9 @@ class SiteSettings(BaseModel):
     hero_headline_1: str = "Weddings, held"
     hero_headline_2: str = "like heirlooms."
     hero_subtitle: str = "Karan Pande photographs weddings, pre-wedding stories and cinematic films across India — quiet, editorial, and unhurried."
+    about_photo_url: str = "https://images.unsplash.com/photo-1554080353-a576cf803bda?auto=format&fit=crop&w=1200&q=80"
+    about_bio_1: str = "I photograph weddings, pre-wedding stories, and cinematic films out of a small studio in Sambhaji Nagar. Six years in, I'm still moved by the same three things — first looks, the last dance, and the way sunlight lands on a mother's hand."
+    about_bio_2: str = "My work sits somewhere between documentary and editorial. I don't direct much, I don't re-shoot the vows, and I don't chase trends in colour. I photograph what actually happens — quietly, on foot, and close enough to hear you laugh."
     phone: str = "+91 98000 00000"
     whatsapp: str = "+91 98000 00000"
     email: str = "hello@karanpande.in"
@@ -182,6 +185,9 @@ class SiteSettingsUpdate(BaseModel):
     hero_headline_1: Optional[str] = None
     hero_headline_2: Optional[str] = None
     hero_subtitle: Optional[str] = None
+    about_photo_url: Optional[str] = None
+    about_bio_1: Optional[str] = None
+    about_bio_2: Optional[str] = None
     phone: Optional[str] = None
     whatsapp: Optional[str] = None
     email: Optional[str] = None

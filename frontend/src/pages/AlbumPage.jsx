@@ -58,9 +58,9 @@ export default function AlbumPage({ category }) {
   ];
 
   return (
-    <div className="pt-32 md:pt-40 pb-24" data-testid={`album-${album.slug}`}>
+    <div className="pt-28 md:pt-40 pb-20 md:pb-24" data-testid={`album-${album.slug}`}>
       {/* Header */}
-      <section className="mx-auto max-w-[1600px] px-6 md:px-10">
+      <section className="mx-auto max-w-[1600px] px-5 md:px-10">
         <Link to={`/${category}`} className="eyebrow inline-flex items-center gap-2 hover:text-[color:var(--copper)]">
           <ArrowLeft size={12} /> {catLabels[category]} folder
         </Link>
@@ -68,7 +68,8 @@ export default function AlbumPage({ category }) {
           <div className="col-span-12 md:col-span-9">
             <RevealHeading
               lines={[album.name]}
-              className="font-serif italic text-[color:var(--ink)] text-[14vw] md:text-[10vw] leading-[0.9] tracking-tight block"
+              className="font-serif italic text-[color:var(--ink)] leading-[0.9] tracking-tight block"
+              style={{ fontSize: "clamp(2.75rem, 10vw, 7.5rem)" }}
             />
           </div>
           <div className="col-span-12 md:col-span-3 md:pt-6 md:text-right">
@@ -90,7 +91,7 @@ export default function AlbumPage({ category }) {
       </section>
 
       {/* Media */}
-      <section className="mx-auto max-w-[1600px] px-6 md:px-10 mt-16 md:mt-24">
+      <section className="mx-auto max-w-[1600px] px-5 md:px-10 mt-12 md:mt-24">
         {items.length === 0 ? (
           <div className="py-32 text-center text-[color:var(--ink)]/50 border-y border-[color:var(--ink)]/10">
             <p className="font-serif italic text-3xl">This folder is being curated.</p>

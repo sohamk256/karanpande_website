@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
 
 /**
- * Renders text as a masked line-by-line reveal.
- * Pass array of strings (each string = 1 line).
+ * Masked line-by-line reveal. No jitter, no rotation — just a calm slide-up.
  */
 export default function RevealHeading({ lines = [], className = "", delay = 0, style }) {
   return (
@@ -10,9 +9,9 @@ export default function RevealHeading({ lines = [], className = "", delay = 0, s
       {lines.map((line, i) => (
         <span key={i} className="hero-mask">
           <motion.span
-            initial={{ y: "115%", rotate: 4 }}
-            animate={{ y: "0%", rotate: 0 }}
-            transition={{ duration: 1.05, delay: delay + i * 0.11, ease: [0.2, 0.8, 0.2, 1] }}
+            initial={{ y: "110%" }}
+            animate={{ y: "0%" }}
+            transition={{ duration: 1.15, delay: delay + i * 0.14, ease: [0.22, 0.61, 0.36, 1] }}
             className="inline-block"
           >
             {line}

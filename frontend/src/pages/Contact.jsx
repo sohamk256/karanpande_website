@@ -1,15 +1,24 @@
 import { Instagram, Phone, Mail, MessageCircle } from "lucide-react";
 import RevealHeading from "../components/site/RevealHeading";
 import { FadeUp } from "../components/site/Reveal";
+import { useSettings } from "../lib/settings";
 
-const CONTACTS = [
-  { icon: Phone, label: "Phone", value: "+91 98000 00000", href: "tel:+919800000000", testid: "contact-phone" },
-  { icon: MessageCircle, label: "WhatsApp", value: "Chat on WhatsApp", href: "https://wa.me/919800000000", testid: "contact-whatsapp" },
-  { icon: Mail, label: "Email", value: "hello@karanpande.in", href: "mailto:hello@karanpande.in", testid: "contact-email" },
-  { icon: Instagram, label: "Instagram", value: "@karanpande", href: "https://instagram.com/karanpande", testid: "contact-instagram" },
-];
+function digits(s = "") { return s.replace(/[^\d]/g, ""); }
 
 export default function Contact() {
+  const { settings } = useSettings();
+  const s = settings || {};
+  const phone = s.phone || "";
+  const wa = digits(s.whatsapp || s.phone || "");
+  const email = s.email || "";
+  const ig = (s.instagram || "").replace(/^@/, "");
+  const contacts = [
+    { icon: Phone, label: "Phone", value: phone || "—", href: `tel:${digits(phone)}`, testid: "contact-phone" },
+    { icon: MessageCircle, label: "WhatsApp", value: "Chat on WhatsApp", href: `https://wa.me/${wa}`, testid: "contact-whatsapp" },
+    { icon: Mail, label: "Email", value: email || "—", href: `mailto:${email}`, testid: "contact-email" },
+    { icon: Instagram, label: "Instagram", value: `@${ig || "—"}`, href: `https://instagram.com/${ig}`, testid: "contact-instagram" },
+  ];
+
   return (
     <div className="pt-32 md:pt-40 pb-32" data-testid="contact-page">
       <section className="mx-auto max-w-[1400px] px-6 md:px-10">
@@ -28,7 +37,7 @@ export default function Contact() {
 
       <section className="mx-auto max-w-[1400px] px-6 md:px-10 mt-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          {CONTACTS.map((c, i) => {
+          {contacts.map((c, i) => {
             const Icon = c.icon;
             return (
               <FadeUp key={c.label} delay={i * 0.08}>
@@ -59,7 +68,7 @@ export default function Contact() {
           <div className="border-t border-[color:var(--ink)]/10 pt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <div className="eyebrow">Studio</div>
-              <p className="mt-3 font-serif text-2xl">Sambhaji Nagar, Maharashtra · India</p>
+              <p className="mt-3 font-serif text-2xl">{s.location || "Sambhaji Nagar, Maharashtra · India"}</p>
             </div>
             <div>
               <div className="eyebrow">Available for</div>

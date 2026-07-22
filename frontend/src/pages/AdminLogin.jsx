@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LogIn } from "lucide-react";
 import { login } from "../lib/api";
+import Logo from "../components/site/Logo";
 import { toast, Toaster } from "sonner";
 
 export default function AdminLogin() {
@@ -16,7 +17,7 @@ export default function AdminLogin() {
     setLoading(true);
     try {
       await login(u, p);
-      toast.success("Welcome back, Karan.");
+      toast.success("Welcome back.");
       nav("/admin");
     } catch (err) {
       toast.error("Invalid credentials.");
@@ -29,14 +30,17 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-[color:var(--cream)] flex items-center justify-center px-6" data-testid="admin-login">
       <Toaster richColors position="top-center" />
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
+        transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
         className="w-full max-w-md bg-[color:var(--surface)] border border-[color:var(--ink)]/10 p-10"
       >
-        <div className="eyebrow text-[color:var(--copper)]">Studio Access</div>
-        <h1 className="font-serif italic text-5xl mt-3">Sign in.</h1>
-        <p className="mt-3 text-sm text-[color:var(--ink)]/60">Karan Pande Photography — admin panel.</p>
+        <div className="text-[color:var(--ink)]">
+          <Logo className="h-12 w-auto" />
+        </div>
+        <div className="eyebrow text-[color:var(--copper)] mt-8">Studio Access</div>
+        <h1 className="font-serif italic text-5xl mt-2">Sign in.</h1>
+        <p className="mt-3 text-sm text-[color:var(--ink)]/60">Shutter Shots by KP — admin panel.</p>
 
         <form onSubmit={submit} className="mt-10 space-y-5">
           <div>

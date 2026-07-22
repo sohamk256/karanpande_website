@@ -90,7 +90,7 @@ body {
     color: var(--copper);
 }
 
-.hero-mask { overflow: hidden; display: block; }
+.hero-mask { overflow: hidden; display: block; padding-top: 0.15em; margin-top: -0.15em; }
 .hero-mask > span { display: block; }
 
 .marquee-track { font-family: var(--font-serif); font-style: italic; }
@@ -130,8 +130,8 @@ body {
 
 /* Image reveal wrappers */
 .img-frame { position: relative; overflow: hidden; background: var(--cream-2); }
-.img-frame img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.4s cubic-bezier(0.2,0.8,0.2,1), filter 0.6s ease; }
-.img-frame:hover img { transform: scale(1.04); filter: saturate(1.05); }
+.img-frame img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.6s cubic-bezier(0.2,0.8,0.2,1), filter 0.6s ease; }
+.img-frame:hover img { transform: scale(1.025); filter: saturate(1.03); }
 
 /* Hairline divider */
 .hairline { height: 1px; background: rgba(26,26,24,0.12); width: 100%; }

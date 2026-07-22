@@ -1,9 +1,10 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
+import re
 import logging
 import uuid
 import jwt
@@ -14,14 +15,14 @@ from datetime import datetime, timedelta, timezone
 
 
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+load_dotenv(ROOT_DIR / ".env")
 
-MONGO_URL = os.environ['MONGO_URL']
-DB_NAME = os.environ['DB_NAME']
-ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'karan')
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'karan@2026')
-JWT_SECRET = os.environ.get('JWT_SECRET', 'change-me')
-JWT_ALGO = 'HS256'
+MONGO_URL = os.environ["MONGO_URL"]
+DB_NAME = os.environ["DB_NAME"]
+ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "karan")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "karan@2026")
+JWT_SECRET = os.environ.get("JWT_SECRET", "change-me")
+JWT_ALGO = "HS256"
 JWT_EXP_HOURS = 24 * 7
 
 client = AsyncIOMotorClient(MONGO_URL)
@@ -35,11 +36,18 @@ logger = logging.getLogger("kp")
 logging.basicConfig(level=logging.INFO)
 
 
-# ---------- Models ----------
+# ---------- Types ----------
 Category = Literal["wedding", "pre-wedding", "cinematic"]
 MediaKind = Literal["image", "video"]
 
 
+def slugify(s: str) -> str:
+    s = s.lower()
+    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+    return s or "album"
+
+
+# ---------- Models ----------
 class MediaItem(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
@@ -47,10 +55,11 @@ class MediaItem(BaseModel):
     category: Category
     kind: MediaKind
     url: str
-    poster: Optional[str] = None  # for videos: thumbnail
+    poster: Optional[str] = None
     title: str = ""
     caption: str = ""
     order: int = 0
+    album_id: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
@@ -62,6 +71,7 @@ class MediaCreate(BaseModel):
     title: str = ""
     caption: str = ""
     order: int = 0
+    album_id: Optional[str] = None
 
 
 class MediaUpdate(BaseModel):
@@ -72,6 +82,74 @@ class MediaUpdate(BaseModel):
     order: Optional[int] = None
     kind: Optional[MediaKind] = None
     category: Optional[Category] = None
+    album_id: Optional[str] = None
+
+
+class Album(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    category: Category
+    slug: str
+    name: str
+    cover: str = ""
+    description: str = ""
+    location: str = ""
+    date: str = ""  # e.g. "Nov 2024"
+    order: int = 0
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+class AlbumCreate(BaseModel):
+    category: Category
+    name: str
+    cover: str = ""
+    description: str = ""
+    location: str = ""
+    date: str = ""
+    order: int = 0
+    slug: Optional[str] = None
+
+
+class AlbumUpdate(BaseModel):
+    name: Optional[str] = None
+    cover: Optional[str] = None
+    description: Optional[str] = None
+    location: Optional[str] = None
+    date: Optional[str] = None
+    order: Optional[int] = None
+    slug: Optional[str] = None
+
+
+class Testimonial(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    author: str
+    role: str = ""
+    quote: str
+    rating: int = 5
+    avatar: str = ""
+    order: int = 0
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+class TestimonialCreate(BaseModel):
+    author: str
+    role: str = ""
+    quote: str
+    rating: int = 5
+    avatar: str = ""
+    order: int = 0
+
+
+class TestimonialUpdate(BaseModel):
+    author: Optional[str] = None
+    role: Optional[str] = None
+    quote: Optional[str] = None
+    rating: Optional[int] = None
+    avatar: Optional[str] = None
+    order: Optional[int] = None
 
 
 class LoginRequest(BaseModel):
@@ -82,6 +160,33 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     token: str
     username: str
+
+
+class SiteSettings(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    hero_video_url: str = "https://videos.pexels.com/video-files/5849887/5849887-uhd_2560_1440_24fps.mp4"
+    hero_poster_url: str = "https://images.pexels.com/photos/33419097/pexels-photo-33419097.jpeg?auto=compress&cs=tinysrgb&w=1600"
+    hero_headline_1: str = "Weddings, held"
+    hero_headline_2: str = "like heirlooms."
+    hero_subtitle: str = "Karan Pande photographs weddings, pre-wedding stories and cinematic films across India — quiet, editorial, and unhurried."
+    phone: str = "+91 98000 00000"
+    whatsapp: str = "+91 98000 00000"
+    email: str = "hello@karanpande.in"
+    instagram: str = "karanpande"
+    location: str = "Sambhaji Nagar, Maharashtra · India"
+
+
+class SiteSettingsUpdate(BaseModel):
+    hero_video_url: Optional[str] = None
+    hero_poster_url: Optional[str] = None
+    hero_headline_1: Optional[str] = None
+    hero_headline_2: Optional[str] = None
+    hero_subtitle: Optional[str] = None
+    phone: Optional[str] = None
+    whatsapp: Optional[str] = None
+    email: Optional[str] = None
+    instagram: Optional[str] = None
+    location: Optional[str] = None
 
 
 # ---------- Auth ----------
@@ -109,50 +214,116 @@ def require_admin(creds: Optional[HTTPAuthorizationCredentials] = Depends(securi
 
 
 # ---------- Seed data ----------
-SEED_MEDIA: List[dict] = [
+def _img(u):
+    return u if "?" in u else u + "?auto=format&fit=crop&w=1600&q=80"
+
+
+SEED_ALBUMS: List[dict] = [
     # Wedding
-    {"category": "wedding", "kind": "image", "url": "https://images.unsplash.com/photo-1630526720753-aa4e71acf67d?auto=format&fit=crop&w=1600&q=80", "title": "The Vows", "order": 1},
-    {"category": "wedding", "kind": "image", "url": "https://images.unsplash.com/photo-1599462616558-2b75fd26a283?auto=format&fit=crop&w=1600&q=80", "title": "First Look", "order": 2},
-    {"category": "wedding", "kind": "image", "url": "https://images.unsplash.com/photo-1665960213508-48f07086d49c?auto=format&fit=crop&w=1600&q=80", "title": "Mandap Light", "order": 3},
-    {"category": "wedding", "kind": "image", "url": "https://images.unsplash.com/photo-1722952934708-749c22eb2e58?auto=format&fit=crop&w=1600&q=80", "title": "Baraat", "order": 4},
-    {"category": "wedding", "kind": "image", "url": "https://images.pexels.com/photos/35069916/pexels-photo-35069916.jpeg?auto=compress&cs=tinysrgb&w=1600", "title": "Sindoor", "order": 5},
-    {"category": "wedding", "kind": "image", "url": "https://images.pexels.com/photos/32060316/pexels-photo-32060316.jpeg?auto=compress&cs=tinysrgb&w=1600", "title": "Bidaai", "order": 6},
+    {"category": "wedding", "name": "Aarav & Meera", "cover": "https://images.unsplash.com/photo-1630526720753-aa4e71acf67d?auto=format&fit=crop&w=1600&q=80", "location": "Udaipur, RJ", "date": "Feb 2025", "description": "A three-day royal wedding in the courtyards of Udaipur.", "order": 1},
+    {"category": "wedding", "name": "Rohan & Priya", "cover": "https://images.unsplash.com/photo-1665960213508-48f07086d49c?auto=format&fit=crop&w=1600&q=80", "location": "Sambhaji Nagar, MH", "date": "Nov 2024", "description": "A neighbourhood wedding lit only by lamps and family.", "order": 2},
+    {"category": "wedding", "name": "Kabir & Ananya", "cover": "https://images.pexels.com/photos/35069916/pexels-photo-35069916.jpeg?auto=compress&cs=tinysrgb&w=1600", "location": "Goa", "date": "Dec 2024", "description": "A beachside ceremony with saltwater and vermilion.", "order": 3},
     # Pre-wedding
-    {"category": "pre-wedding", "kind": "image", "url": "https://images.unsplash.com/photo-1715285977619-6d9357168f46?auto=format&fit=crop&w=1600&q=80", "title": "Dunes", "order": 1},
-    {"category": "pre-wedding", "kind": "image", "url": "https://images.unsplash.com/photo-1715285978388-312252ee23de?auto=format&fit=crop&w=1600&q=80", "title": "Hand in Hand", "order": 2},
-    {"category": "pre-wedding", "kind": "image", "url": "https://images.unsplash.com/photo-1653688529238-1326ab9eeab9?auto=format&fit=crop&w=1600&q=80", "title": "Golden Hour", "order": 3},
-    {"category": "pre-wedding", "kind": "image", "url": "https://images.unsplash.com/photo-1715285977526-5574f70b0d3d?auto=format&fit=crop&w=1600&q=80", "title": "Wildflowers", "order": 4},
+    {"category": "pre-wedding", "name": "Ishaan & Riya", "cover": "https://images.unsplash.com/photo-1715285977619-6d9357168f46?auto=format&fit=crop&w=1600&q=80", "location": "Jaisalmer dunes", "date": "Jan 2025", "description": "A day of gold hour walks across cold desert.", "order": 1},
+    {"category": "pre-wedding", "name": "Vikram & Naina", "cover": "https://images.unsplash.com/photo-1653688529238-1326ab9eeab9?auto=format&fit=crop&w=1600&q=80", "location": "Coorg", "date": "Oct 2024", "description": "Coffee plantations, mist, and quiet laughter.", "order": 2},
     # Cinematic
-    {
-        "category": "cinematic", "kind": "video",
-        "url": "https://videos.pexels.com/video-files/5849887/5849887-uhd_2560_1440_24fps.mp4",
-        "poster": "https://images.pexels.com/photos/33419097/pexels-photo-33419097.jpeg?auto=compress&cs=tinysrgb&w=1600",
-        "title": "Aarav × Meera",
-        "caption": "A monsoon wedding film, Sambhaji Nagar", "order": 1,
-    },
-    {
-        "category": "cinematic", "kind": "video",
-        "url": "https://videos.pexels.com/video-files/3205827/3205827-uhd_2560_1440_25fps.mp4",
-        "poster": "https://images.pexels.com/photos/10603895/pexels-photo-10603895.jpeg?auto=compress&cs=tinysrgb&w=1600",
-        "title": "The First Dance",
-        "caption": "A candlelit story", "order": 2,
-    },
-    {
-        "category": "cinematic", "kind": "video",
-        "url": "https://videos.pexels.com/video-files/5849887/5849887-uhd_2560_1440_24fps.mp4",
-        "poster": "https://images.unsplash.com/photo-1519689950823-0a2251441815?auto=format&fit=crop&w=1600&q=80",
-        "title": "Golden Bidaai",
-        "caption": "A closing chapter", "order": 3,
-    },
+    {"category": "cinematic", "name": "Aarav × Meera — Film", "cover": "https://images.pexels.com/photos/33419097/pexels-photo-33419097.jpeg?auto=compress&cs=tinysrgb&w=1600", "location": "Udaipur", "date": "Feb 2025", "description": "A monsoon wedding film cut to a live sitar score.", "order": 1},
+    {"category": "cinematic", "name": "The First Dance", "cover": "https://images.pexels.com/photos/10603895/pexels-photo-10603895.jpeg?auto=compress&cs=tinysrgb&w=1600", "location": "Mumbai", "date": "Sep 2024", "description": "A candlelit reception told in one long take.", "order": 2},
+]
+
+# Media items keyed by album name (resolved after album insert)
+SEED_MEDIA_BY_ALBUM: dict = {
+    "Aarav & Meera": [
+        {"kind": "image", "url": "https://images.unsplash.com/photo-1630526720753-aa4e71acf67d?auto=format&fit=crop&w=1800&q=80", "title": "The Vows"},
+        {"kind": "image", "url": "https://images.unsplash.com/photo-1599462616558-2b75fd26a283?auto=format&fit=crop&w=1800&q=80", "title": "First Look"},
+        {"kind": "image", "url": "https://images.unsplash.com/photo-1722952934708-749c22eb2e58?auto=format&fit=crop&w=1800&q=80", "title": "Baraat"},
+        {"kind": "image", "url": "https://images.pexels.com/photos/32060316/pexels-photo-32060316.jpeg?auto=compress&cs=tinysrgb&w=1800", "title": "Bidaai"},
+    ],
+    "Rohan & Priya": [
+        {"kind": "image", "url": "https://images.unsplash.com/photo-1665960213508-48f07086d49c?auto=format&fit=crop&w=1800&q=80", "title": "Mandap Light"},
+        {"kind": "image", "url": "https://images.unsplash.com/photo-1599462616558-2b75fd26a283?auto=format&fit=crop&w=1800&q=80", "title": "Together"},
+        {"kind": "image", "url": "https://images.pexels.com/photos/35069916/pexels-photo-35069916.jpeg?auto=compress&cs=tinysrgb&w=1800", "title": "Sindoor"},
+    ],
+    "Kabir & Ananya": [
+        {"kind": "image", "url": "https://images.pexels.com/photos/35069916/pexels-photo-35069916.jpeg?auto=compress&cs=tinysrgb&w=1800", "title": "By the sea"},
+        {"kind": "image", "url": "https://images.unsplash.com/photo-1722952934708-749c22eb2e58?auto=format&fit=crop&w=1800&q=80", "title": "Salt & vermilion"},
+        {"kind": "image", "url": "https://images.pexels.com/photos/32060316/pexels-photo-32060316.jpeg?auto=compress&cs=tinysrgb&w=1800", "title": "Sunset walk"},
+    ],
+    "Ishaan & Riya": [
+        {"kind": "image", "url": "https://images.unsplash.com/photo-1715285977619-6d9357168f46?auto=format&fit=crop&w=1800&q=80", "title": "Dunes"},
+        {"kind": "image", "url": "https://images.unsplash.com/photo-1715285978388-312252ee23de?auto=format&fit=crop&w=1800&q=80", "title": "Hand in Hand"},
+        {"kind": "image", "url": "https://images.unsplash.com/photo-1715285977526-5574f70b0d3d?auto=format&fit=crop&w=1800&q=80", "title": "Wildflowers"},
+    ],
+    "Vikram & Naina": [
+        {"kind": "image", "url": "https://images.unsplash.com/photo-1653688529238-1326ab9eeab9?auto=format&fit=crop&w=1800&q=80", "title": "Golden Hour"},
+        {"kind": "image", "url": "https://images.unsplash.com/photo-1715285977526-5574f70b0d3d?auto=format&fit=crop&w=1800&q=80", "title": "Plantation"},
+        {"kind": "image", "url": "https://images.unsplash.com/photo-1715285978388-312252ee23de?auto=format&fit=crop&w=1800&q=80", "title": "Mist"},
+    ],
+    "Aarav × Meera — Film": [
+        {"kind": "video", "url": "https://videos.pexels.com/video-files/5849887/5849887-uhd_2560_1440_24fps.mp4",
+         "poster": "https://images.pexels.com/photos/33419097/pexels-photo-33419097.jpeg?auto=compress&cs=tinysrgb&w=1600",
+         "title": "Full film", "caption": "5 min · sitar score"},
+    ],
+    "The First Dance": [
+        {"kind": "video", "url": "https://videos.pexels.com/video-files/3205827/3205827-uhd_2560_1440_25fps.mp4",
+         "poster": "https://images.pexels.com/photos/10603895/pexels-photo-10603895.jpeg?auto=compress&cs=tinysrgb&w=1600",
+         "title": "First Dance", "caption": "A single take, candlelit"},
+    ],
+}
+
+
+SEED_TESTIMONIALS: List[dict] = [
+    {"author": "Aarav & Meera", "role": "Wedding, Udaipur", "quote": "Karan didn't just photograph our wedding — he remembered it for us. Every image feels like the moment we lived, only softer, slower, more beautiful.", "rating": 5, "order": 1},
+    {"author": "Rohan & Priya", "role": "Wedding, Sambhaji Nagar", "quote": "We asked for honest, un-posed photographs. Karan gave us something better — a small book of our two families that we open every anniversary.", "rating": 5, "order": 2},
+    {"author": "Ishaan & Riya", "role": "Pre-Wedding, Jaisalmer", "quote": "The most patient photographer we've worked with. He waited three hours for the light to turn and it was worth every minute.", "rating": 5, "order": 3},
+    {"author": "Kabir & Ananya", "role": "Wedding film, Goa", "quote": "Our film feels like a short movie of our life, not a highlights reel. Friends have watched it more than we have.", "rating": 5, "order": 4},
 ]
 
 
 async def seed_if_empty():
-    count = await db.media.count_documents({})
-    if count == 0:
-        logger.info("Seeding media collection…")
-        docs = [MediaItem(**m).model_dump() for m in SEED_MEDIA]
-        await db.media.insert_many(docs)
+    # Media + Albums migration/seed
+    album_count = await db.albums.count_documents({})
+    if album_count == 0:
+        logger.info("Reseeding albums + media…")
+        await db.media.delete_many({})
+        await db.albums.delete_many({})
+
+        name_to_id: dict = {}
+        for a in SEED_ALBUMS:
+            album = Album(slug=slugify(a["name"]), **a)
+            await db.albums.insert_one(album.model_dump())
+            name_to_id[a["name"]] = album.id
+
+        for album_name, items in SEED_MEDIA_BY_ALBUM.items():
+            album_id = name_to_id.get(album_name)
+            if not album_id:
+                continue
+            album = next(a for a in SEED_ALBUMS if a["name"] == album_name)
+            for idx, m in enumerate(items):
+                media = MediaItem(
+                    category=album["category"],
+                    kind=m.get("kind", "image"),
+                    url=m["url"],
+                    poster=m.get("poster"),
+                    title=m.get("title", ""),
+                    caption=m.get("caption", ""),
+                    order=idx + 1,
+                    album_id=album_id,
+                )
+                await db.media.insert_one(media.model_dump())
+
+    # Testimonials
+    t_count = await db.testimonials.count_documents({})
+    if t_count == 0:
+        docs = [Testimonial(**t).model_dump() for t in SEED_TESTIMONIALS]
+        await db.testimonials.insert_many(docs)
+
+    # Settings
+    settings_doc = await db.settings.find_one({"_id": "site"})
+    if not settings_doc:
+        default = SiteSettings().model_dump()
+        default["_id"] = "site"
+        await db.settings.insert_one(default)
 
 
 # ---------- Routes ----------
@@ -166,6 +337,7 @@ async def health():
     return {"status": "ok"}
 
 
+# --- Auth
 @api_router.post("/admin/login", response_model=LoginResponse)
 async def admin_login(body: LoginRequest):
     if body.username != ADMIN_USERNAME or body.password != ADMIN_PASSWORD:
@@ -178,16 +350,15 @@ async def admin_me(user: str = Depends(require_admin)):
     return {"username": user}
 
 
+# --- Media (kept for backwards-compat; now typically filtered by album)
 @api_router.get("/media", response_model=List[MediaItem])
 async def list_all_media():
-    docs = await db.media.find({}, {"_id": 0}).sort([("category", 1), ("order", 1)]).to_list(1000)
-    return docs
+    return await db.media.find({}, {"_id": 0}).sort([("category", 1), ("order", 1)]).to_list(2000)
 
 
 @api_router.get("/media/{category}", response_model=List[MediaItem])
 async def list_media(category: Category):
-    docs = await db.media.find({"category": category}, {"_id": 0}).sort("order", 1).to_list(1000)
-    return docs
+    return await db.media.find({"category": category}, {"_id": 0}).sort("order", 1).to_list(2000)
 
 
 @api_router.post("/admin/media", response_model=MediaItem)
@@ -205,8 +376,7 @@ async def update_media(item_id: str, body: MediaUpdate, user: str = Depends(requ
     res = await db.media.update_one({"id": item_id}, {"$set": updates})
     if res.matched_count == 0:
         raise HTTPException(status_code=404, detail="Media not found")
-    doc = await db.media.find_one({"id": item_id}, {"_id": 0})
-    return doc
+    return await db.media.find_one({"id": item_id}, {"_id": 0})
 
 
 @api_router.delete("/admin/media/{item_id}")
@@ -217,12 +387,112 @@ async def delete_media(item_id: str, user: str = Depends(require_admin)):
     return {"deleted": item_id}
 
 
+# --- Albums
+@api_router.get("/albums", response_model=List[Album])
+async def list_all_albums():
+    return await db.albums.find({}, {"_id": 0}).sort([("category", 1), ("order", 1)]).to_list(500)
+
+
+@api_router.get("/albums/{category}", response_model=List[Album])
+async def list_albums(category: Category):
+    return await db.albums.find({"category": category}, {"_id": 0}).sort("order", 1).to_list(500)
+
+
+@api_router.get("/albums/{category}/{slug}")
+async def get_album_with_media(category: Category, slug: str):
+    album = await db.albums.find_one({"category": category, "slug": slug}, {"_id": 0})
+    if not album:
+        raise HTTPException(status_code=404, detail="Album not found")
+    media = await db.media.find({"album_id": album["id"]}, {"_id": 0}).sort("order", 1).to_list(500)
+    return {"album": album, "media": media}
+
+
+@api_router.post("/admin/albums", response_model=Album)
+async def create_album(body: AlbumCreate, user: str = Depends(require_admin)):
+    payload = body.model_dump()
+    payload["slug"] = payload.get("slug") or slugify(payload["name"])
+    album = Album(**payload)
+    await db.albums.insert_one(album.model_dump())
+    return album
+
+
+@api_router.put("/admin/albums/{album_id}", response_model=Album)
+async def update_album(album_id: str, body: AlbumUpdate, user: str = Depends(require_admin)):
+    updates = {k: v for k, v in body.model_dump().items() if v is not None}
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    if updates.get("name") and not updates.get("slug"):
+        updates["slug"] = slugify(updates["name"])
+    res = await db.albums.update_one({"id": album_id}, {"$set": updates})
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Album not found")
+    return await db.albums.find_one({"id": album_id}, {"_id": 0})
+
+
+@api_router.delete("/admin/albums/{album_id}")
+async def delete_album(album_id: str, user: str = Depends(require_admin)):
+    res = await db.albums.delete_one({"id": album_id})
+    if res.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Album not found")
+    # unlink orphan media (do not delete photos, just clear album)
+    await db.media.update_many({"album_id": album_id}, {"$set": {"album_id": None}})
+    return {"deleted": album_id}
+
+
+# --- Testimonials
+@api_router.get("/testimonials", response_model=List[Testimonial])
+async def list_testimonials():
+    return await db.testimonials.find({}, {"_id": 0}).sort("order", 1).to_list(200)
+
+
+@api_router.post("/admin/testimonials", response_model=Testimonial)
+async def create_testimonial(body: TestimonialCreate, user: str = Depends(require_admin)):
+    t = Testimonial(**body.model_dump())
+    await db.testimonials.insert_one(t.model_dump())
+    return t
+
+
+@api_router.put("/admin/testimonials/{tid}", response_model=Testimonial)
+async def update_testimonial(tid: str, body: TestimonialUpdate, user: str = Depends(require_admin)):
+    updates = {k: v for k, v in body.model_dump().items() if v is not None}
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    res = await db.testimonials.update_one({"id": tid}, {"$set": updates})
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Testimonial not found")
+    return await db.testimonials.find_one({"id": tid}, {"_id": 0})
+
+
+@api_router.delete("/admin/testimonials/{tid}")
+async def delete_testimonial(tid: str, user: str = Depends(require_admin)):
+    res = await db.testimonials.delete_one({"id": tid})
+    if res.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Testimonial not found")
+    return {"deleted": tid}
+
+
+# --- Settings
+@api_router.get("/settings", response_model=SiteSettings)
+async def get_settings():
+    doc = await db.settings.find_one({"_id": "site"}, {"_id": 0})
+    return doc or SiteSettings().model_dump()
+
+
+@api_router.put("/admin/settings", response_model=SiteSettings)
+async def update_settings(body: SiteSettingsUpdate, user: str = Depends(require_admin)):
+    updates = {k: v for k, v in body.model_dump().items() if v is not None}
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    await db.settings.update_one({"_id": "site"}, {"$set": updates}, upsert=True)
+    return await db.settings.find_one({"_id": "site"}, {"_id": 0})
+
+
 app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
     allow_methods=["*"],
     allow_headers=["*"],
 )

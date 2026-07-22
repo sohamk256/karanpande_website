@@ -1,0 +1,114 @@
+{
+  "project_name": "Karan Pande Photography Portfolio",
+  "theme": "light",
+  "design_concept": "Premium Editorial Photography Magazine. Awwwards SOTD level. Bold, kinetic, and cohesive. Avoids typical generic SaaS aesthetics. Relies heavily on typography, motion, negative space, and a highly constrained, sophisticated color palette.",
+  "typography": {
+    "heading_font": "Cormorant Garamond",
+    "body_font": "Manrope",
+    "font_pairings_rationale": "Cormorant Garamond brings a warm, elegant, editorial serif feel perfect for wedding photography, while Manrope provides clean, highly legible, modern geometric contrast for UI elements and body text.",
+    "hierarchy_rules": {
+      "h1": "text-5xl md:text-6xl+ tracking-tighter leading-none (used for hero masked reveals)",
+      "h2": "text-4xl md:text-5xl tracking-tight leading-tight",
+      "h3": "text-2xl md:text-3xl tracking-tight",
+      "body": "text-base leading-relaxed tracking-normal",
+      "labels": "text-xs md:text-sm uppercase tracking-[0.2em] font-bold"
+    }
+  },
+  "colors": {
+    "rules": "CRITICAL: NO DARK THEME. Use this palette strictly. Avoid raw #000000 or generic grays.",
+    "palette": {
+      "cream": {
+        "hex": "#F4F1EB",
+        "usage": "Primary background color for all pages."
+      },
+      "sage_green": {
+        "hex": "#7A8B7A",
+        "usage": "Primary brand color. Used for large typographic statements, footer backgrounds, and secondary sections."
+      },
+      "copper": {
+        "hex": "#B87333",
+        "usage": "Accent color. Used for hover states, buttons, links, and the custom cursor."
+      },
+      "ink": {
+        "hex": "#1A1A18",
+        "usage": "Primary text color. Dark enough for 4.5:1 contrast, warm enough to fit the cream background."
+      },
+      "surface": {
+        "hex": "#FFFFFF",
+        "usage": "Used sparingly for isolated cards, lightboxes, or admin panel containers to create slight depth against cream."
+      }
+    }
+  },
+  "visual_enhancers": {
+    "textures": "Include a subtle noise/grain overlay div covering the screen with pointer-events-none and opacity-5 to simulate magazine paper/film grain.",
+    "radii": "Mixed approach. Photos should predominantly have sharp edges (rounded-none) to feel like printed photographs or slightly rounded (rounded-sm) for a polished look. Buttons and chips should be fully rounded (rounded-full) for high contrast in shape.",
+    "borders": "Delicate 1px borders using ink/10 or copper/20. No heavy borders."
+  },
+  "motion": {
+    "scrolling": "MUST use Lenis for smooth momentum scrolling. The app must feel heavy and premium.",
+    "hero_reveal": "Masked line-by-line reveal for the H1 on load. Use Framer Motion (initial y: 100%, animate y: 0) inside an overflow-hidden wrapper for each line.",
+    "scroll_reveals": "Staggered fade-up and slight Y-translation (e.g., y: 40 to y: 0) as sections enter the viewport.",
+    "parallax": "Use Framer Motion's useScroll and useTransform for a subtle Y-axis parallax on the hero image/video and large gallery images.",
+    "cursor": "Implement a custom cursor tracking the mouse position. Turns into a 'View' magnifier (copper dot expanding) when hovering over gallery items."
+  },
+  "layouts": {
+    "spacing": "Extremely generous. Sections should be padded with py-24 to py-32. Let the elements breathe.",
+    "hero": "100vh. Full-bleed background video with a subtle bg-ink/20 overlay. Do NOT make the overlay too dark. Massive typography anchored to bottom-left.",
+    "gallery_grid": "Tetris/Asymmetric grid. DO NOT USE perfect square grids. Mix col-span-12, col-span-8, col-span-4. Use explicit aspect ratios (aspect-[4/5], aspect-[16/9]) to create tension.",
+    "marquee": "Use react-fast-marquee. Very slow, elegant motion. Text: 'Weddings · Pre-Wedding · Cinematic · Sambhaji Nagar · Est. 2026'. Color: sage_green background with cream text, or cream bg with copper text."
+  },
+  "components_strategy": {
+    "marketing_pages": "Use pure HTML/Tailwind for the landing page and galleries to allow maximum creative freedom with grids and overlaps.",
+    "admin_panel": "Use Shadcn components heavily (Tables, Inputs, Dialogs, Cards) to build a robust, clean CMS experience. Protect via a simple mock login state.",
+    "nav": "Fixed header, mix of glassmorphism (backdrop-blur-md bg-cream/70) but must have 1px bottom border (border-ink/10). Include Logo, links, and contact chip.",
+    "video_player_cards": "For cinematic section, display large 16:9 thumbnails with a central 'Play' button icon. On click, open a fullscreen overlay/lightbox video player."
+  },
+  "pages": {
+    "Home": "Hero (Video) -> Editorial Marquee -> Numbered Chapters (01. Approach, 02. Craft) -> Featured Asymmetric Grid -> Footer",
+    "Wedding_Gallery": "Immersive image gallery. Mix of portrait and landscape shots with lightbox capability.",
+    "Pre_Wedding_Gallery": "Similar to Wedding, focused on outdoor/nature aesthetics.",
+    "Cinematic_Gallery": "Video thumbnails in a staggered layout.",
+    "Contact": "No forms. Pure typography with large 'Let's Talk' heading and elegant chips/buttons linking to Phone, WhatsApp, Email, Instagram.",
+    "Admin_Login": "Simple centered card, minimalist form.",
+    "Admin_Dashboard": "Sidebar or top nav (Dashboard, Weddings, Pre-Weddings, Cinematic). Table view of assets with Add/Delete/Edit actions."
+  },
+  "image_urls": {
+    "wedding": [
+      "https://images.unsplash.com/photo-1630526720753-aa4e71acf67d",
+      "https://images.unsplash.com/photo-1599462616558-2b75fd26a283",
+      "https://images.unsplash.com/photo-1665960213508-48f07086d49c",
+      "https://images.unsplash.com/photo-1722952934708-749c22eb2e58",
+      "https://images.pexels.com/photos/35069916/pexels-photo-35069916.jpeg",
+      "https://images.pexels.com/photos/32060316/pexels-photo-32060316.jpeg"
+    ],
+    "pre_wedding": [
+      "https://images.unsplash.com/photo-1715285977619-6d9357168f46",
+      "https://images.unsplash.com/photo-1715285978388-312252ee23de",
+      "https://images.unsplash.com/photo-1653688529238-1326ab9eeab9",
+      "https://images.unsplash.com/photo-1715285977526-5574f70b0d3d"
+    ],
+    "cinematic_thumbnails": [
+      "https://images.pexels.com/photos/33419097/pexels-photo-33419097.jpeg",
+      "https://images.pexels.com/photos/10603895/pexels-photo-10603895.jpeg",
+      "https://images.unsplash.com/photo-1519689950823-0a2251441815",
+      "https://images.unsplash.com/photo-1629756048377-09540f52caa1"
+    ]
+  },
+  "video_urls": {
+    "hero_background": "https://videos.pexels.com/video-files/3205827/3205827-uhd_2560_1440_25fps.mp4",
+    "cinematic_1": "https://videos.pexels.com/video-files/5849887/5849887-uhd_2560_1440_24fps.mp4",
+    "cinematic_2": "https://videos.pexels.com/video-files/3205827/3205827-uhd_2560_1440_25fps.mp4"
+  },
+  "testing": {
+    "data_testid_rules": "Add data-testid to all interactive elements. e.g., data-testid='nav-link-wedding', data-testid='gallery-img-1', data-testid='admin-login-submit'"
+  },
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "You tend to converge toward generic SaaS aesthetics. Force yourself to build a high-fashion, editorial layout. Do not center everything. Emphasize asymmetry.",
+    "Do NOT use Space Grotesk or Inter for headings. Strictly use Cormorant Garamond.",
+    "Use 2-3x more spacing than typical. Don't let elements touch.",
+    "Ensure the hero background video works properly with a dark overlay to maintain text readability.",
+    "For the custom cursor, hide the default cursor on desktop using 'cursor-none' and use a framer-motion driven div tracking mouse coordinates.",
+    "Mock the admin panel functionality cleanly using React state or standard frontend approaches if the backend isn't strictly requested to persist. Prioritize the UI experience.",
+    "Use react-icons or lucide-react for UI icons, but keep icon usage minimal. Let typography and photos lead."
+  ]
+}

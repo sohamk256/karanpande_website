@@ -296,7 +296,7 @@ export default function Home() {
       </section>
 
       {/* ---------- Category folders / Albums ---------- */}
-      <section className="bg-[color:var(--cream-2)] py-24 md:py-32 border-t border-[color:var(--ink)]/10" data-testid="folders-section">
+      <section className="bg-[color:var(--sage-soft)] py-24 md:py-32 border-t border-[color:var(--sage-deep)]/15" data-testid="folders-section">
         <div className="mx-auto max-w-[1500px] px-6 md:px-10">
           <FadeUp>
             <div className="eyebrow">Bodies of work</div>
@@ -357,7 +357,7 @@ export default function Home() {
       </section>
 
       {/* ---------- About Karan (with experience/stats embedded) ---------- */}
-      <section className="py-24 md:py-40" data-testid="about-section">
+      <section className="py-24 md:py-40 bg-[color:var(--cream)]" data-testid="about-section">
         <div className="mx-auto max-w-[1500px] px-6 md:px-10 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-start">
           <FadeUp className="md:col-span-5">
             <div className="img-frame aspect-[4/5]">
@@ -419,8 +419,24 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ---------- Sage pull-quote band ---------- */}
+      <section className="bg-[color:var(--sage-deep)] text-[color:var(--cream)] py-20 md:py-28" data-testid="pullquote-band">
+        <div className="mx-auto max-w-[1500px] px-6 md:px-10 grid grid-cols-12 gap-6 items-center">
+          <div className="col-span-12 md:col-span-2">
+            <div className="eyebrow text-[color:var(--copper)]">Field notes</div>
+          </div>
+          <div className="col-span-12 md:col-span-10">
+            <p className="font-serif italic text-3xl md:text-5xl leading-[1.1] tracking-tight">
+              &ldquo;A good wedding photograph isn&rsquo;t the biggest moment —
+              it&rsquo;s the second right after it, when nobody&rsquo;s watching.&rdquo;
+            </p>
+            <div className="mt-6 eyebrow text-[color:var(--cream)]/70">— From a notebook, Sambhaji Nagar, 2024</div>
+          </div>
+        </div>
+      </section>
+
       {/* ---------- Services ---------- */}
-      <section className="bg-[color:var(--cream-2)] border-t border-[color:var(--ink)]/10 py-24 md:py-32">
+      <section className="bg-[color:var(--cream)] border-t border-[color:var(--sage-deep)]/15 py-24 md:py-32">
         <div className="mx-auto max-w-[1500px] px-6 md:px-10">
           <FadeUp>
             <div className="eyebrow">What I offer</div>

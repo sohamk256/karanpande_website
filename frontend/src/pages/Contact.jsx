@@ -65,18 +65,18 @@ export default function Contact() {
 
       <section className="mx-auto max-w-[1400px] px-6 md:px-10 mt-24 md:mt-32">
         <FadeUp>
-          <div className="border-t border-[color:var(--ink)]/10 pt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="border-t border-[color:var(--sage-deep)]/15 pt-10 bg-[color:var(--sage-soft)] p-8 md:p-12 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <div className="eyebrow">Studio</div>
-              <p className="mt-3 font-serif text-2xl">{s.location || "Sambhaji Nagar, Maharashtra · India"}</p>
+              <p className="mt-3 font-serif text-2xl text-[color:var(--sage-deep)]">{s.location || "Sambhaji Nagar, Maharashtra · India"}</p>
             </div>
             <div>
               <div className="eyebrow">Available for</div>
-              <p className="mt-3 font-serif text-2xl">Weddings · Pre-Wedding · Cinematic Films</p>
+              <p className="mt-3 font-serif text-2xl text-[color:var(--sage-deep)]">Weddings · Pre-Wedding · Cinematic Films</p>
             </div>
             <div>
               <div className="eyebrow">Travels</div>
-              <p className="mt-3 font-serif text-2xl">Worldwide, on request</p>
+              <p className="mt-3 font-serif text-2xl text-[color:var(--sage-deep)]">Worldwide, on request</p>
             </div>
           </div>
         </FadeUp>

@@ -132,52 +132,59 @@ function FeaturedCollage({ frames }) {
   if (frames.length === 0) return null;
   const [f1, f2, f3, f4, f5, f6] = frames;
 
+  const cell = "img-frame h-full w-full block";
   const cap = (i, label) => (
-    <div className="mt-3 flex items-center justify-between text-[10px] tracking-[0.28em] uppercase text-[color:var(--ink)]/60">
+    <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-[10px] tracking-[0.28em] uppercase text-[color:var(--cream)] drop-shadow">
       <span>{label}</span>
       <span className="text-[color:var(--copper)]">Nº {String(i).padStart(2, "0")}</span>
     </div>
   );
 
   return (
-    <div className="grid grid-cols-12 gap-4 md:gap-6">
-      {/* Row 1 */}
+    <div className="grid grid-cols-12 grid-rows-6 md:grid-rows-4 gap-3 md:gap-4 md:h-[76vh]">
+      {/* Big feature */}
       {f1 && (
-        <FadeUp className="col-span-12 md:col-span-7">
-          <figure>
-            <div className="img-frame aspect-[5/7]"><img src={f1.url} alt="Featured" /></div>
-            {cap(1, f1.title || "Wedding")}
-          </figure>
+        <FadeUp className="relative col-span-12 md:col-span-8 row-span-3 md:row-span-3">
+          <div className={cell}><img src={f1.url} alt={f1.title || "Featured"} /></div>
+          {cap(1, f1.title || "Wedding")}
         </FadeUp>
       )}
-      <div className="col-span-12 md:col-span-5 flex flex-col gap-4 md:gap-6">
-        {f2 && (
-          <FadeUp delay={0.06}>
-            <figure>
-              <div className="img-frame aspect-[16/11]"><img src={f2.url} alt="Featured" /></div>
-              {cap(2, f2.title || "Pre-Wedding")}
-            </figure>
-          </FadeUp>
-        )}
-        {f3 && (
-          <FadeUp delay={0.12}>
-            <figure>
-              <div className="img-frame aspect-[16/11]"><img src={f3.url} alt="Featured" /></div>
-              {cap(3, f3.title || "Cinematic")}
-            </figure>
-          </FadeUp>
-        )}
-      </div>
 
-      {/* Row 2 — three tall portraits */}
-      {[f4, f5, f6].filter(Boolean).map((f, i) => (
-        <FadeUp key={f.id || i} delay={0.16 + i * 0.05} className="col-span-12 md:col-span-4">
-          <figure>
-            <div className="img-frame aspect-[3/4]"><img src={f.url} alt="Featured" /></div>
-            {cap(4 + i, f.title || "Frame")}
-          </figure>
+      {/* Tall right */}
+      {f2 && (
+        <FadeUp delay={0.05} className="relative col-span-6 md:col-span-4 row-span-1 md:row-span-2">
+          <div className={cell}><img src={f2.url} alt={f2.title || "Featured"} /></div>
+          {cap(2, f2.title || "Pre-Wedding")}
         </FadeUp>
-      ))}
+      )}
+
+      {/* Small right */}
+      {f3 && (
+        <FadeUp delay={0.10} className="relative col-span-6 md:col-span-4 row-span-1 md:row-span-1">
+          <div className={cell}><img src={f3.url} alt={f3.title || "Featured"} /></div>
+          {cap(3, f3.title || "Cinematic")}
+        </FadeUp>
+      )}
+
+      {/* Row 4 — three side by side */}
+      {f4 && (
+        <FadeUp delay={0.15} className="relative col-span-4 md:col-span-4 row-span-1 md:row-span-1">
+          <div className={cell}><img src={f4.url} alt={f4.title || "Featured"} /></div>
+          {cap(4, f4.title || "Frame")}
+        </FadeUp>
+      )}
+      {f5 && (
+        <FadeUp delay={0.20} className="relative col-span-4 md:col-span-4 row-span-1 md:row-span-1">
+          <div className={cell}><img src={f5.url} alt={f5.title || "Featured"} /></div>
+          {cap(5, f5.title || "Frame")}
+        </FadeUp>
+      )}
+      {f6 && (
+        <FadeUp delay={0.25} className="relative col-span-4 md:col-span-4 row-span-1 md:row-span-1">
+          <div className={cell}><img src={f6.url} alt={f6.title || "Featured"} /></div>
+          {cap(6, f6.title || "Frame")}
+        </FadeUp>
+      )}
     </div>
   );
 }
@@ -272,13 +279,13 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* ---------- FEATURED COLLAGE — directly under the hero ---------- */}
-      <section className="mx-auto max-w-[1600px] px-6 md:px-10 py-20 md:py-28" data-testid="featured-section">
+      {/* ---------- FEATURED COLLAGE — directly under the hero, single viewport ---------- */}
+      <section className="mx-auto max-w-[1600px] px-6 md:px-10 py-14 md:py-10 md:min-h-screen md:flex md:flex-col md:justify-center" data-testid="featured-section">
         <FadeUp>
-          <div className="flex items-end justify-between mb-10 md:mb-16 gap-4 flex-wrap">
+          <div className="flex items-end justify-between mb-6 md:mb-8 gap-4 flex-wrap">
             <div>
               <div className="eyebrow">Selected frames</div>
-              <h2 className="font-serif text-5xl md:text-6xl mt-3 tracking-tight">A recent index.</h2>
+              <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl mt-2 tracking-tight">A recent index.</h2>
             </div>
             <Link to="/wedding" className="btn-pill" data-testid="featured-see-all">
               See All Weddings <ArrowUpRight size={14} />

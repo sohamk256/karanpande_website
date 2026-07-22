@@ -66,7 +66,7 @@ export default function Nav() {
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3">
             <span className={`text-[10px] tracking-[0.28em] uppercase ${onDark ? "text-[color:var(--cream)]/80" : "text-[color:var(--ink)]/60"}`}>
               Sambhaji Nagar · IN
             </span>

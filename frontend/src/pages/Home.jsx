@@ -246,28 +246,29 @@ export default function Home() {
 
         <motion.div
           initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5, duration: 1 }}
-          className="absolute top-24 left-6 md:left-10 right-6 md:right-10 flex justify-between text-[color:var(--cream)]"
+          className="absolute top-24 left-6 md:left-10 right-6 md:right-10 flex justify-between items-center text-[color:var(--cream)] gap-4"
         >
-          <span className="eyebrow text-[color:var(--copper)]">Est. 2019 · Sambhaji Nagar</span>
-          <span className="eyebrow text-[color:var(--cream)]/80 hidden md:block">Shutter Shots by KP</span>
+          <span className="eyebrow text-[color:var(--copper)] truncate">Est. 2019 · Sambhaji Nagar</span>
+          <span className="eyebrow text-[color:var(--cream)]/80 hidden lg:block truncate">Shutter Shots by KP</span>
         </motion.div>
 
-        <div className="absolute bottom-14 md:bottom-24 left-6 md:left-10 right-6 md:right-16 z-10">
+        <div className="absolute bottom-14 md:bottom-20 left-6 md:left-10 right-6 md:right-16 z-10">
           <div className="max-w-[1500px]">
             <RevealHeading
-              className="font-serif italic text-[color:var(--cream)] leading-[0.9] tracking-tight text-[16vw] md:text-[11vw]"
+              className="font-serif italic text-[color:var(--cream)] leading-[0.92] tracking-tight block"
+              style={{ fontSize: "clamp(2.75rem, 10vw, 6.5rem)" }}
               lines={settings ? [settings.hero_headline_1, settings.hero_headline_2] : ["Weddings, held", "like heirlooms."]}
               delay={0.35}
               key={settings ? `${settings.hero_headline_1}-${settings.hero_headline_2}` : "hero"}
             />
             <motion.div
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.0, duration: 1 }}
-              className="mt-6 md:mt-10 flex flex-col md:flex-row md:items-end justify-between gap-6"
+              className="mt-5 md:mt-8 flex flex-col md:flex-row md:items-end justify-between gap-5 md:gap-8"
             >
-              <p className="text-[color:var(--cream)]/85 max-w-xl text-base md:text-lg leading-relaxed">
+              <p className="text-[color:var(--cream)]/85 max-w-lg text-sm md:text-base lg:text-lg leading-relaxed">
                 {settings?.hero_subtitle}
               </p>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-shrink-0">
                 <Link to="/wedding" data-testid="hero-cta-work" className="btn-pill filled">See The Work <ArrowUpRight size={14} /></Link>
                 <Link to="/contact" data-testid="hero-cta-contact" className="btn-pill" style={{ color: "var(--cream)", borderColor: "rgba(244,241,235,0.4)" }}>Enquire</Link>
               </div>

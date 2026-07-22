@@ -130,59 +130,59 @@ function TestimonialSlider({ items }) {
 /* ----------------------------- Featured collage ----------------------------- */
 function FeaturedCollage({ frames }) {
   if (frames.length === 0) return null;
-  const [f1, f2, f3, f4, f5, f6] = frames;
+  const [f1, f2, f3, f4, f5] = frames;
 
-  const cell = "img-frame h-full w-full block";
   const cap = (i, label) => (
-    <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-[10px] tracking-[0.28em] uppercase text-[color:var(--cream)] drop-shadow">
-      <span>{label}</span>
-      <span className="text-[color:var(--copper)]">Nº {String(i).padStart(2, "0")}</span>
+    <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-[10px] tracking-[0.28em] uppercase text-[color:var(--cream)]">
+      <span className="drop-shadow">{label}</span>
+      <span className="text-[color:var(--copper)] drop-shadow">Nº {String(i).padStart(2, "0")}</span>
     </div>
   );
 
+  const cell = "img-frame relative h-full w-full block";
+  const scrim =
+    "pointer-events-none absolute inset-0 bg-gradient-to-t from-[color:var(--ink)]/60 via-transparent to-transparent";
+
   return (
-    <div className="grid grid-cols-12 grid-rows-6 md:grid-rows-4 gap-3 md:gap-4 md:h-[76vh]">
-      {/* Big feature */}
+    <div className="grid grid-cols-12 md:grid-rows-2 gap-3 md:gap-4 md:h-[78vh]">
+      {/* Feature — tall portrait on the left */}
       {f1 && (
-        <FadeUp className="relative col-span-12 md:col-span-8 row-span-3 md:row-span-3">
+        <FadeUp className="relative col-span-12 md:col-span-5 md:row-span-2 h-[70vh] md:h-auto">
           <div className={cell}><img src={f1.url} alt={f1.title || "Featured"} /></div>
+          <div className={scrim} />
           {cap(1, f1.title || "Wedding")}
         </FadeUp>
       )}
 
-      {/* Tall right */}
+      {/* Row 1 right */}
       {f2 && (
-        <FadeUp delay={0.05} className="relative col-span-6 md:col-span-4 row-span-1 md:row-span-2">
+        <FadeUp delay={0.05} className="relative col-span-6 md:col-span-3 h-[38vh] md:h-auto">
           <div className={cell}><img src={f2.url} alt={f2.title || "Featured"} /></div>
+          <div className={scrim} />
           {cap(2, f2.title || "Pre-Wedding")}
         </FadeUp>
       )}
-
-      {/* Small right */}
       {f3 && (
-        <FadeUp delay={0.10} className="relative col-span-6 md:col-span-4 row-span-1 md:row-span-1">
+        <FadeUp delay={0.10} className="relative col-span-6 md:col-span-4 h-[38vh] md:h-auto">
           <div className={cell}><img src={f3.url} alt={f3.title || "Featured"} /></div>
+          <div className={scrim} />
           {cap(3, f3.title || "Cinematic")}
         </FadeUp>
       )}
 
-      {/* Row 4 — three side by side */}
+      {/* Row 2 right */}
       {f4 && (
-        <FadeUp delay={0.15} className="relative col-span-4 md:col-span-4 row-span-1 md:row-span-1">
+        <FadeUp delay={0.15} className="relative col-span-6 md:col-span-4 h-[38vh] md:h-auto">
           <div className={cell}><img src={f4.url} alt={f4.title || "Featured"} /></div>
+          <div className={scrim} />
           {cap(4, f4.title || "Frame")}
         </FadeUp>
       )}
       {f5 && (
-        <FadeUp delay={0.20} className="relative col-span-4 md:col-span-4 row-span-1 md:row-span-1">
+        <FadeUp delay={0.20} className="relative col-span-6 md:col-span-3 h-[38vh] md:h-auto">
           <div className={cell}><img src={f5.url} alt={f5.title || "Featured"} /></div>
+          <div className={scrim} />
           {cap(5, f5.title || "Frame")}
-        </FadeUp>
-      )}
-      {f6 && (
-        <FadeUp delay={0.25} className="relative col-span-4 md:col-span-4 row-span-1 md:row-span-1">
-          <div className={cell}><img src={f6.url} alt={f6.title || "Featured"} /></div>
-          {cap(6, f6.title || "Frame")}
         </FadeUp>
       )}
     </div>
